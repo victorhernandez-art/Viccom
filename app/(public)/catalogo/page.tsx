@@ -58,7 +58,7 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
 
   const brands     = (brandsRes.data     ?? []) as Brand[]
   const categories = (categoriesRes.data ?? []) as Category[]
-  const settings   = Object.fromEntries((settingsRes.data ?? []).map(s => [s.key, s.value]))
+  const settings   = Object.fromEntries((settingsRes.data ?? []).map((s: any) => [s.key, s.value]))
   const whatsapp   = settings['whatsapp_number'] ?? ''
 
   // Construir query de productos

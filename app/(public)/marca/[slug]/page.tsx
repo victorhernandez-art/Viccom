@@ -42,7 +42,7 @@ export default async function BrandPage({ params, searchParams }: BrandPageProps
 
   if (!brandRes.data) notFound()
   const brand    = brandRes.data
-  const settings = Object.fromEntries((settingsRes.data ?? []).map(s => [s.key, s.value]))
+  const settings = Object.fromEntries((settingsRes.data ?? []).map((s: any) => [s.key, s.value]))
   const whatsapp = settings['whatsapp_number'] ?? ''
 
   let query = supabase

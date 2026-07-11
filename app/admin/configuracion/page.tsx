@@ -18,7 +18,7 @@ export default async function AdminConfiguracionPage() {
     supabase.from('categories').select('id,nombre,slug,margen_override').eq('activo', true).order('orden'),
   ])
 
-  const settings = Object.fromEntries((settingsRes.data ?? []).map(s => [s.key, s.value]))
+  const settings = Object.fromEntries((settingsRes.data ?? []).map((s: any) => [s.key, s.value]))
   const categories = (categoriesRes.data ?? []) as Pick<Category, 'id' | 'nombre' | 'slug' | 'margen_override'>[]
 
   const globalMargin = Number(settings['margen_global'] ?? 30)

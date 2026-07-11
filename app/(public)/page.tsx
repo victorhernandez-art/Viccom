@@ -56,7 +56,7 @@ export default async function HomePage() {
   const offersProds   = (offersRes.data    ?? []) as ProductCatalog[]
 
   const settings     = Object.fromEntries(
-    (settingsRes.data ?? []).map(s => [s.key, s.value])
+    (settingsRes.data ?? []).map((s: any) => [s.key, s.value])
   )
   const whatsapp = settings['whatsapp_number'] ?? ''
 

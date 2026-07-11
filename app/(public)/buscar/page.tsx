@@ -31,7 +31,7 @@ export default async function BuscarPage({ searchParams }: BuscarPageProps) {
     .select('key,value')
     .in('key', ['whatsapp_number'])
 
-  const settings = Object.fromEntries((settingsRes.data ?? []).map(s => [s.key, s.value]))
+  const settings = Object.fromEntries((settingsRes.data ?? []).map((s: any) => [s.key, s.value]))
   const whatsapp = settings['whatsapp_number'] ?? ''
 
   let products: ProductCatalog[] = []

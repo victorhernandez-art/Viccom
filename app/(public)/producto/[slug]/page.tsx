@@ -81,7 +81,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       return (b.existencia_total ?? 0) - (a.existencia_total ?? 0)
     })
     .slice(0, 16)
-  const settings  = Object.fromEntries((settingsRes.data ?? []).map(s => [s.key, s.value]))
+  const settings  = Object.fromEntries((settingsRes.data ?? []).map((s: any) => [s.key, s.value]))
   const whatsapp  = settings['whatsapp_number'] ?? ''
   const waMsgBase = settings['whatsapp_message'] ?? 'Hola, me interesa cotizar el producto:'
 
