@@ -54,7 +54,7 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
     supabase.from('brands').select('*').eq('activo', true).order('nombre'),
     supabase.from('categories').select('*').eq('activo', true).order('orden'),
     supabase.from('settings').select('key,value').in('key', ['whatsapp_number']),
-  ])
+  ]) as [any, any, any]
 
   const brands     = (brandsRes.data     ?? []) as Brand[]
   const categories = (categoriesRes.data ?? []) as Category[]

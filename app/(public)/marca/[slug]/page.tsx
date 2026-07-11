@@ -38,7 +38,7 @@ export default async function BrandPage({ params, searchParams }: BrandPageProps
   const [brandRes, settingsRes] = await Promise.all([
     supabase.from('brands').select('*').eq('slug', slug).eq('activo', true).single(),
     supabase.from('settings').select('key,value').in('key', ['whatsapp_number']),
-  ])
+  ]) as [any, any]
 
   if (!brandRes.data) notFound()
   const brand    = brandRes.data

@@ -49,7 +49,7 @@ export default async function HomePage() {
       .from('settings')
       .select('key,value')
       .in('key', ['whatsapp_number']),
-  ])
+  ]) as [any, any, any, any]
 
   const categories   = (categoriesRes.data ?? []) as Category[]
   const featuredProds = (featuredRes.data  ?? []) as ProductCatalog[]

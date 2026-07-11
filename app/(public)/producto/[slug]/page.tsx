@@ -69,7 +69,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       .from('settings')
       .select('key,value')
       .in('key', ['whatsapp_number', 'whatsapp_message']),
-  ])
+  ]) as [any, any, any]
 
   const inventory = inventoryRes.data ?? []
   const relatedPool = (relatedRes.data ?? []) as ProductCatalog[]

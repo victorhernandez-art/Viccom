@@ -21,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from('brands')
       .select('slug,updated_at')
       .eq('activo', true),
-  ])
+  ]) as [any, any, any]
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`,        lastModified: new Date(), changeFrequency: 'daily',   priority: 1.0 },
