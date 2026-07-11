@@ -24,11 +24,11 @@ interface ProductPageProps {
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params
   const supabase  = await createClient()
-  const { data }  = await supabase
+  const { data }  = (await supabase
     .from('v_products_catalog')
     .select('nombre,descripcion,imagen_principal,slug,marca_nombre,categoria_nombre')
     .eq('slug', slug)
-    .single()
+    .single()) as any
 
   if (!data) return { title: 'Producto no encontrado' }
   return buildProductMetadata(data)
@@ -39,11 +39,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const supabase  = await createClient()
 
   // Producto principal
-  const { data: product } = await supabase
+  const { data: product } = (await supabase
     .from('v_products_catalog')
     .select('*')
     .eq('slug', slug)
-    .single()
+    .single()) as any
 
   if (!product) notFound()
 
