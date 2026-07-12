@@ -14,7 +14,8 @@ echo "==> Setting up VPS for VICCOM Sync Service"
 echo "    Domain: ${DOMAIN}"
 
 # --- System update -----------------------------------------------------------
-apt-get update && apt-get upgrade -y
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
 
 # --- Node.js 22 LTS -----------------------------------------------------------
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
