@@ -46,6 +46,16 @@ const slides = [
     accent: '#CC0000',
     image: '/img/slider/4.png',
   },
+  {
+    id: 5,
+    title: 'Gráficos y Procesadores AMD',
+    subtitle: 'Temporada Legendaria AMD Radeon',
+    description: 'Experimenta el máximo rendimiento con los componentes y procesadores AMD.',
+    cta: 'Ver Componentes',
+    link: '/catalogo?buscar=amd',
+    accent: '#E61C24',
+    image: '/img/slider/5.png',
+  },
 ]
 
 export default function HeroBanner() {
