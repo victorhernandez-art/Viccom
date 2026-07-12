@@ -124,7 +124,7 @@ export default function Footer() {
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-white font-medium">Dirección</p>
-                  <p>Tuxtla Gutiérrez, Chiapas</p>
+                  <p>Fracc. las Águilas, calle Aguiluchos #364. Tuxtla Gutiérrez, Chiapas</p>
                 </div>
               </li>
             </ul>
