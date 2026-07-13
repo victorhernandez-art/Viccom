@@ -69,9 +69,9 @@ async function insertCategory(
   order = 0
 ): Promise<DbCategory> {
   const nombre = normalizeName(name)
-  const slug = slugify(nombre)
+  const slug = parent ? `${parent.slug}-${slugify(nombre)}` : slugify(nombre)
   const nivel = parent ? Number(parent.nivel ?? 0) + 1 : 0
-  const path = buildPath(parent, slug)
+  const path = buildPath(parent, slugify(nombre))
 
   const row = {
     nombre,
@@ -120,7 +120,7 @@ export async function findOrCreateSubcategory(
   order = 0
 ): Promise<DbCategory> {
   const nombre = normalizeName(name)
-  const slug = slugify(nombre)
+  const slug = `${parent.slug}-${slugify(nombre)}`
   if (!slug) throw new Error('Subcategory name is empty')
 
   const existing = await getCategoryByParentAndSlug(parent.id, slug)

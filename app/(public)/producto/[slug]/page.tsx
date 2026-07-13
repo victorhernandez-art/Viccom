@@ -258,7 +258,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
       )}
 
       {/* ─── Ficha Técnica Extendida (Icecat) ─────────────────────────── */}
-      <IcecatSpecs upc={(product.especificaciones as any)?.upc} />
+      <IcecatSpecs 
+        upc={(product.especificaciones as any)?.upc} 
+        fichaTecnicaCt={(product.especificaciones as any)?.ficha_tecnica}
+      />
 
       {/* ─── Recomendado para ti ─────────────────────────────────────── */}
       {related.length > 0 && (

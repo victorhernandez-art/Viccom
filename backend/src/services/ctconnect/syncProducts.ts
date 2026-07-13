@@ -39,6 +39,10 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
         return total + Number(item.existencia ?? 0)
       }, 0)
 
+      const isUsd = p.moneda?.toUpperCase() === 'USD'
+      const tipoCambio = Number(p.tipoCambio ?? 1)
+      const costoPesos = Number((p.precio * (isUsd ? tipoCambio : 1)).toFixed(2))
+
       const categoryPath = getProductCategoryPath(p)
 
       return {
@@ -50,8 +54,8 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
         marca_id:     brandMap.get(p.marca.toLowerCase()) ?? null,
         categoria_id: categoryIds.get(categoryPath.join('/').toLowerCase()) ?? null,
         subcategoria: p.subcategoria,
-        costo_ct:     p.precio,
-        precio_publico: p.precio,
+        costo_ct:     costoPesos,
+        precio_publico: costoPesos,
         existencia_total: existenciaTotal,
         peso_kg:      p.peso,
         dimensiones: {
@@ -62,7 +66,8 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
         },
         especificaciones: {
           upc:    p.upc,
-          moneda: p.moneda,
+          moneda: 'MXN',
+          ficha_tecnica: p.especificaciones_tecnicas || []
         },
         activo:       p.activo,
         descontinuado: false,
@@ -158,4 +163,3 @@ async function ensureBrands(ctProducts: CTProduct[]): Promise<Map<string, string
 
   return map
 }
-

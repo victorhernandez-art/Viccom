@@ -58,22 +58,27 @@ async function downloadCatalogFromFtp(): Promise<{ filePath: string; fileName: s
 
     logger.info('FTP connected to CT Connect')
 
+    // Cambiar al directorio configurado
+    const targetDir = process.env.CT_FTP_PATH ?? '/'
+    logger.info(`Changing FTP directory to: ${targetDir}`)
+    await client.cd(targetDir)
+
     // Listar archivos y obtener el más reciente
-    const list = await client.list(process.env.CT_FTP_PATH ?? '/')
+    const list = await client.list()
     const jsonFiles = list
       .filter(f => f.name.endsWith('.json') || f.name.endsWith('.JSON'))
       .sort((a, b) => (b.modifiedAt?.getTime() ?? 0) - (a.modifiedAt?.getTime() ?? 0))
 
     if (jsonFiles.length === 0) {
-      throw new Error('No se encontraron archivos JSON en el FTP de CT Connect')
+      throw new Error(`No se encontraron archivos JSON en el directorio FTP: ${targetDir}`)
     }
 
     const remoteFile = jsonFiles[0]
-    const fileName   = remoteFile.name
+    const fileName   = `ct-catalog-${new Date().toISOString().replace(/[:.]/g, '-')}.json`
     const filePath   = path.join(TMP_DIR, fileName)
 
-    logger.info(`Downloading: ${fileName}`)
-    await client.downloadTo(filePath, fileName)
+    logger.info(`Downloading remote: ${remoteFile.name} to local: ${fileName}`)
+    await client.downloadTo(filePath, remoteFile.name)
     logger.info(`Downloaded to: ${filePath}`)
 
     return { filePath, fileName }

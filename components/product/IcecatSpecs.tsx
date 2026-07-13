@@ -24,14 +24,32 @@ interface FeatureGroup {
 
 interface IcecatSpecsProps {
   upc: string | null | undefined
+  fichaTecnicaCt?: { tipo: string, valor: string }[] | null
 }
 
-export default function IcecatSpecs({ upc }: IcecatSpecsProps) {
+export default function IcecatSpecs({ upc, fichaTecnicaCt }: IcecatSpecsProps) {
   const [groups, setGroups] = useState<FeatureGroup[]>([])
   const [loading, setLoading] = useState(false)
   const [hasData, setHasData] = useState(false)
 
   useEffect(() => {
+    // Cargar ficha técnica de CT como fallback/inicial
+    if (fichaTecnicaCt && Array.isArray(fichaTecnicaCt) && fichaTecnicaCt.length > 0) {
+      const ctGroup: FeatureGroup = {
+        ID: 'ct-group-1',
+        FeatureGroup: { Name: { Value: 'Características del Producto' } },
+        Features: fichaTecnicaCt.map((item: any) => ({
+          Feature: { Name: { Value: item.tipo ?? item.Name?.Value ?? '' } },
+          Value: item.valor ?? item.Value ?? ''
+        }))
+      }
+      setGroups([ctGroup])
+      setHasData(true)
+    } else {
+      setGroups([])
+      setHasData(false)
+    }
+
     if (!upc) return
 
     const cleanUpc = upc.replace(/\D/g, '')
@@ -66,9 +84,9 @@ export default function IcecatSpecs({ upc }: IcecatSpecsProps) {
     }
 
     fetchSpecs()
-  }, [upc])
+  }, [upc, fichaTecnicaCt])
 
-  if (loading) {
+  if (loading && groups.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col items-center justify-center min-h-[200px] animate-pulse">
         <Cpu className="w-8 h-8 text-[#1B2B6B]/40 animate-spin mb-3" />

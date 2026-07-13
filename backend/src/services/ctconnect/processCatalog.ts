@@ -19,6 +19,8 @@ export interface CTProduct {
   upc:          string
   activo:       boolean
   existencia:   CTAlmacen[]
+  tipoCambio:   number
+  especificaciones_tecnicas: any[]
 }
 
 export interface CTAlmacen {
@@ -79,14 +81,21 @@ export async function processCatalog(filePath: string): Promise<CTProduct[]> {
       subcategoria: categoriaPath[1] ?? String(i.subcategoria ?? ''),
       categoriaPath,
       imagen:       String(i.imagen ?? i.img ?? ''),
-      descripcion:  String(i.descripcion_larga ?? i.descripcion ?? ''),
+      descripcion:  String(i.descripcion_corta ?? i.descripcion_larga ?? i.descripcion ?? ''),
       peso:         Number(i.peso ?? 0),
       alto:         Number(i.alto ?? 0),
       largo:        Number(i.largo ?? 0),
       ancho:        Number(i.ancho ?? 0),
-      upc:          String(i.upc ?? ''),
+      upc:          String(i.upc && String(i.upc).trim() !== '' ? i.upc : (i.ean ?? i.gtin ?? '')),
       activo:       i.activo !== false,
-      existencia:   Array.isArray(i.existencia) ? (i.existencia as CTAlmacen[]) : [],
+      tipoCambio:   Number(i.tipoCambio ?? i.tipo_cambio ?? 1),
+      especificaciones_tecnicas: Array.isArray(i.especificaciones) ? i.especificaciones : [],
+      existencia: (i.existencia && typeof i.existencia === 'object' && !Array.isArray(i.existencia))
+        ? Object.entries(i.existencia).map(([almacen, cantidad]) => ({
+            almacen,
+            existencia: Number(cantidad ?? 0)
+          }))
+        : (Array.isArray(i.existencia) ? (i.existencia as CTAlmacen[]) : []),
     }
   }).filter(p => p.clave !== '')
 
