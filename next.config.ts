@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'www.ctonline.mx',
-        pathname: '/images/**',
+        hostname: '*.ctonline.mx',
+        pathname: '/**',
       },
       {
         protocol: 'https',
