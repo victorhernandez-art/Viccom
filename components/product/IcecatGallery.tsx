@@ -90,6 +90,7 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
             src={images[activeIndex]}
             alt={`${nombreProducto} - Vista ${activeIndex + 1}`}
             fill
+            unoptimized
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-contain transition-transform duration-500 group-hover:scale-105"
             priority={activeIndex === 0}
@@ -144,6 +145,7 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
                   src={img}
                   alt={`Miniatura ${idx + 1}`}
                   fill
+                  unoptimized
                   sizes="80px"
                   className="object-contain"
                 />
@@ -178,6 +180,7 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
                 src={images[activeIndex]}
                 alt={nombreProducto}
                 fill
+                unoptimized
                 className="object-contain"
               />
             </div>

@@ -1,40 +1,46 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Flag } from 'lucide-react'
 import { formatCurrency, getDisplayStock, getProductImageUrl } from '@/lib/utils'
-import { type ProductCatalog } from '@/types'
 
-interface RecommendedCarouselProps {
-  products: ProductCatalog[]
+interface RecommendedProduct {
+  id: string
+  nombre: string
+  sku_ct: string
+  slug: string
+  precio_publico: number
+  existencia_total: number
+  existencia_tuxtla: number
+  imagen_principal: string | null
 }
 
-const VISIBLE_ITEMS = 4
+interface RecommendedCarouselProps {
+  products: RecommendedProduct[]
+  whatsappNumber: string
+}
 
 export default function RecommendedCarousel({ products }: RecommendedCarouselProps) {
   const [page, setPage] = useState(0)
-  const pages = Math.max(1, Math.ceil(products.length / VISIBLE_ITEMS))
+  const itemsPerPage = 4
+  const pages = Math.ceil(products.length / itemsPerPage)
 
-  const groups = useMemo(() => {
-    const chunks: ProductCatalog[][] = []
-    for (let i = 0; i < products.length; i += VISIBLE_ITEMS) {
-      chunks.push(products.slice(i, i + VISIBLE_ITEMS))
-    }
-    return chunks
-  }, [products])
+  const canSlide = products.length > itemsPerPage
+  const startIndex = page * itemsPerPage
+  const currentGroup = products.slice(startIndex, startIndex + itemsPerPage)
 
-  const canSlide = pages > 1
-  const currentGroup = groups[page] ?? []
+  if (products.length === 0) return null
 
   return (
-    <section className="bg-gray-200 p-3 md:p-4 rounded-sm">
-      <h2 className="text-center text-[#51637A] text-xl md:text-2xl font-semibold uppercase tracking-wide mb-3">
-        Recomendado para ti
+    <section className="mb-12">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span className="w-1.5 h-6 bg-[#1B2B6B] rounded-full"></span>
+        Productos Recomendados
       </h2>
 
-      <div className="relative bg-white border border-gray-200 px-12 py-3 overflow-hidden">
+      <div className="relative group">
         <button
           type="button"
           onClick={() => canSlide && setPage(p => (p - 1 + pages) % pages)}
@@ -61,6 +67,7 @@ export default function RecommendedCarousel({ products }: RecommendedCarouselPro
                       src={carouselImage}
                       alt={product.nombre}
                       fill
+                      unoptimized
                       sizes="(max-width: 1024px) 50vw, 25vw"
                       className="object-contain"
                     />
