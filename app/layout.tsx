@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
   },
   icons: {
-    icon: '/img/logo.png',
-    apple: '/img/logo.png',
+    icon: '/img/slider/ico.png',
+    apple: '/img/slider/ico.png',
   },
 }
 
