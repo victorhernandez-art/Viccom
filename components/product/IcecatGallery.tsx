@@ -91,6 +91,7 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
             alt={`${nombreProducto} - Vista ${activeIndex + 1}`}
             fill
             unoptimized
+            referrerPolicy="no-referrer"
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-contain transition-transform duration-500 group-hover:scale-105"
             priority={activeIndex === 0}
@@ -146,6 +147,7 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
                   alt={`Miniatura ${idx + 1}`}
                   fill
                   unoptimized
+                  referrerPolicy="no-referrer"
                   sizes="80px"
                   className="object-contain"
                 />
@@ -181,6 +183,7 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
                 alt={nombreProducto}
                 fill
                 unoptimized
+                referrerPolicy="no-referrer"
                 className="object-contain"
               />
             </div>

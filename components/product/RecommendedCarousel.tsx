@@ -68,6 +68,7 @@ export default function RecommendedCarousel({ products }: RecommendedCarouselPro
                       alt={product.nombre}
                       fill
                       unoptimized
+                      referrerPolicy="no-referrer"
                       sizes="(max-width: 1024px) 50vw, 25vw"
                       className="object-contain"
                     />
