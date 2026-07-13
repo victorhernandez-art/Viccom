@@ -1,8 +1,12 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Phone, Mail, MapPin, MessageCircle, Facebook, Instagram, Twitter } from 'lucide-react'
+import { Phone, Mail, MapPin, MessageCircle, Facebook, Instagram, Twitter, X } from 'lucide-react'
 
 export default function Footer() {
+  const [isTermsOpen, setIsTermsOpen] = useState(false)
   const year = new Date().getFullYear()
   const phoneDisplay = '961 120 93 61'
   const phoneHref = '9611209361'
@@ -80,9 +84,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/terminos" className="hover:text-white hover:underline transition-colors">
+                <button
+                  onClick={() => setIsTermsOpen(true)}
+                  className="hover:text-white hover:underline transition-colors text-left"
+                >
                   Términos y Condiciones
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -152,6 +159,89 @@ export default function Footer() {
           <p>Precios en MXN. Precios sujetos a cambio sin previo aviso.</p>
         </div>
       </div>
+
+      {isTermsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100 text-gray-800 animate-in fade-in zoom-in-95 duration-250">
+            {/* Cabecera */}
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+              <h2 className="text-lg font-bold text-[#1B2B6B] flex items-center gap-2">
+                Términos y Condiciones de Uso
+              </h2>
+              <button
+                onClick={() => setIsTermsOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-200"
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Contenido con Scroll */}
+            <div className="overflow-y-auto p-6 space-y-5 text-sm leading-relaxed text-gray-600">
+              <div>
+                <h3 className="font-bold text-gray-900 text-base mb-1">TÉRMINOS Y CONDICIONES DE USO</h3>
+                <p className="text-xs text-gray-400">Última actualización: julio de 2026</p>
+              </div>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">1. Identificación del sitio</h4>
+                <p>Bienvenido a Viccom. Al acceder y utilizar el sitio web <a href="https://viccom.com.mx" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://viccom.com.mx</a>, el usuario acepta los presentes Términos y Condiciones de Uso. Si el usuario no está de acuerdo con estos términos, deberá abstenerse de utilizar el sitio.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">2. Objeto</h4>
+                <p>Viccom es un sitio web dedicado a la publicación de información, catálogo y promoción de productos tecnológicos, tales como computadoras, accesorios, componentes y equipos relacionados. Actualmente el sitio tiene fines informativos y de exhibición de productos.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">3. Uso del sitio</h4>
+                <p>El usuario se compromete a utilizar el sitio de forma lícita, no realizar actividades que afecten la seguridad del sitio, no intentar acceder a información restringida y no copiar el contenido para fines comerciales sin autorización.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">4. Propiedad intelectual</h4>
+                <p>Todo el contenido publicado en este sitio, incluyendo logotipos, diseño, fotografías, textos, iconos, código fuente propio y material gráfico, es propiedad de Viccom o de sus respectivos titulares y está protegido por la legislación aplicable.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">5. Información de productos</h4>
+                <p>Viccom procura mantener actualizada la información de los productos. La disponibilidad, especificaciones, imágenes y precios podrán modificarse sin previo aviso. Las imágenes mostradas tienen fines ilustrativos.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">6. Enlaces externos</h4>
+                <p>Este sitio puede contener enlaces hacia otros sitios web. Viccom no es responsable del contenido, disponibilidad o políticas de dichos sitios.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">7. Limitación de responsabilidad</h4>
+                <p>Viccom no garantiza que el sitio permanezca disponible de forma ininterrumpida y no será responsable por interrupciones del servicio, errores técnicos, fallas de internet o pérdida de información ocasionada por terceros.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">8. Modificaciones</h4>
+                <p>Viccom podrá modificar los presentes Términos y Condiciones en cualquier momento. Las modificaciones entrarán en vigor desde su publicación.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">9. Legislación aplicable</h4>
+                <p>Estos términos se regirán conforme a las leyes vigentes de los Estados Unidos Mexicanos.</p>
+              </section>
+            </div>
+
+            {/* Botón de cierre en el footer del modal */}
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end bg-gray-50">
+              <button
+                onClick={() => setIsTermsOpen(false)}
+                className="px-5 py-2 bg-[#1B2B6B] hover:bg-[#2A4DA0] text-white font-semibold text-sm rounded-xl transition-all shadow-sm"
+              >
+                Aceptar y Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   )
 }
