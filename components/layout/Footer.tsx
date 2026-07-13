@@ -24,17 +24,7 @@ export default function Footer() {
               Distribuidor de equipos de cómputo, impresoras, accesorios y tecnología.
               Proveemos soluciones tecnológicas a empresas y particulares.
             </p>
-            <div className="flex items-center gap-3">
-              <a
-                href="https://wa.me/521XXXXXXXXXX"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-500 px-3 py-2 rounded-lg text-sm transition-colors"
-              >
-                <MessageCircle className="w-4 h-4" />
-                WhatsApp
-              </a>
-            </div>
+
           </div>
 
           <div>
