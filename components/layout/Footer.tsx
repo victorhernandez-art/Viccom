@@ -7,6 +7,7 @@ import { Phone, Mail, MapPin, MessageCircle, Facebook, Instagram, Twitter, X } f
 
 export default function Footer() {
   const [isTermsOpen, setIsTermsOpen] = useState(false)
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false)
   const year = new Date().getFullYear()
   const phoneDisplay = '961 120 93 61'
   const phoneHref = '9611209361'
@@ -79,9 +80,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/aviso-privacidad" className="hover:text-white hover:underline transition-colors">
+                <button
+                  onClick={() => setIsPrivacyOpen(true)}
+                  className="hover:text-white hover:underline transition-colors text-left"
+                >
                   Aviso de Privacidad
-                </Link>
+                </button>
               </li>
               <li>
                 <button
@@ -237,6 +241,83 @@ export default function Footer() {
                 className="px-5 py-2 bg-[#1B2B6B] hover:bg-[#2A4DA0] text-white font-semibold text-sm rounded-xl transition-all shadow-sm"
               >
                 Aceptar y Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isPrivacyOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100 text-gray-800 animate-in fade-in zoom-in-95 duration-250">
+            {/* Cabecera */}
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+              <h2 className="text-lg font-bold text-[#1B2B6B] flex items-center gap-2">
+                Aviso de Privacidad
+              </h2>
+              <button
+                onClick={() => setIsPrivacyOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-200"
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Contenido con Scroll */}
+            <div className="overflow-y-auto p-6 space-y-5 text-sm leading-relaxed text-gray-600">
+              <div>
+                <h3 className="font-bold text-gray-900 text-base mb-1">AVISO DE PRIVACIDAD</h3>
+                <p className="text-xs text-gray-400">Última actualización: julio de 2026</p>
+              </div>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">Identidad del responsable</h4>
+                <p>Viccom es responsable del tratamiento de los datos personales que, en su caso, sean proporcionados por los usuarios del sitio web.</p>
+                <p className="mt-2 text-xs text-gray-500">
+                  Sitio web: <a href="https://viccom.com.mx" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://viccom.com.mx</a><br />
+                  Correo de contacto: <a href="mailto:vic_computo@hotmail.com" className="text-blue-600 hover:underline">vic_computo@hotmail.com</a>
+                </p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">Información que actualmente se recopila</h4>
+                <p>Actualmente este sitio no solicita registro de usuarios, no solicita datos bancarios ni información personal mediante formularios de compra. Sin embargo, el servidor puede registrar automáticamente información técnica como dirección IP, tipo de navegador, sistema operativo, fecha y hora de acceso y cookies técnicas necesarias para el funcionamiento del sitio.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">Uso de la información</h4>
+                <p>La información técnica podrá utilizarse únicamente para mejorar el funcionamiento del sitio, generar estadísticas de uso y mantener la seguridad de la plataforma.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">Cookies</h4>
+                <p>Viccom puede utilizar cookies técnicas necesarias para el funcionamiento del sitio. En caso de implementar herramientas de análisis o publicidad personalizada, este aviso será actualizado oportunamente.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">Transferencia de datos</h4>
+                <p>Viccom no vende, renta ni comparte datos personales con terceros, salvo cuando exista obligación legal.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">Derechos ARCO</h4>
+                <p>Cuando el sitio implemente formularios de contacto, registro de usuarios o procesos de compra, los titulares podrán ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición mediante solicitud al correo electrónico de contacto.</p>
+              </section>
+
+              <section>
+                <h4 className="font-bold text-gray-900 mb-1">Cambios al aviso</h4>
+                <p>Viccom podrá actualizar este Aviso de Privacidad cuando sea necesario. Las modificaciones serán publicadas en este mismo sitio web.</p>
+              </section>
+            </div>
+
+            {/* Botón de cierre en el footer del modal */}
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end bg-gray-50">
+              <button
+                onClick={() => setIsPrivacyOpen(false)}
+                className="px-5 py-2 bg-[#1B2B6B] hover:bg-[#2A4DA0] text-white font-semibold text-sm rounded-xl transition-all shadow-sm"
+              >
+                Cerrar
               </button>
             </div>
           </div>
