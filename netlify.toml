@@ -1,0 +1,3 @@
+# Configuración de Netlify para la optimización de imágenes (Netlify Image CDN)
+[images]
+  allowed_domains = ["static.ctonline.mx", "www.ctonline.mx"]
