@@ -184,7 +184,6 @@ export default function Footer() {
             {/* Contenido con Scroll */}
             <div className="overflow-y-auto p-6 space-y-5 text-sm leading-relaxed text-gray-600">
               <div>
-                <h3 className="font-bold text-gray-900 text-base mb-1">TÉRMINOS Y CONDICIONES DE USO</h3>
                 <p className="text-xs text-gray-400">Última actualización: julio de 2026</p>
               </div>
 
@@ -267,7 +266,6 @@ export default function Footer() {
             {/* Contenido con Scroll */}
             <div className="overflow-y-auto p-6 space-y-5 text-sm leading-relaxed text-gray-600">
               <div>
-                <h3 className="font-bold text-gray-900 text-base mb-1">AVISO DE PRIVACIDAD</h3>
                 <p className="text-xs text-gray-400">Última actualización: julio de 2026</p>
               </div>
 
