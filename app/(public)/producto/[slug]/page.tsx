@@ -89,11 +89,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   // Calcular stock real en vivo sumando los almacenes de la tabla inventory
   const tuxtlaStock = inventory
-    .filter((inv: any) => inv.almacen === 'TXA')
+    .filter((inv: any) => inv.almacen === 'TXA' || inv.almacen === 'TXL')
     .reduce((sum: number, inv: any) => sum + Number(inv.existencia ?? 0), 0)
 
+  // Almacenes de envío nacional autorizados por CT
+  const almacenesNacionales = [
+    'DFA', 'GDL', 'MTY', 'HMO', 'MID', 'VER', 'PUE', 'LEO', 'QRO', 'SLP', 
+    'TOL', 'TRN', 'CUN', 'VHA', 'D2A', 'DFP', 'MOR', 'CHI', 'ZAC', 'AGS',
+    'CEL', 'CHI', 'CLN', 'DGO', 'MID', 'OAX', 'PAC', 'SLT', 'VER', 'XLP'
+  ]
+
   const otherStock = inventory
-    .filter((inv: any) => inv.almacen !== 'TXA')
+    .filter((inv: any) => almacenesNacionales.includes(inv.almacen))
     .reduce((sum: number, inv: any) => sum + Number(inv.existencia ?? 0), 0)
 
   const totalLiveStock = tuxtlaStock + otherStock
