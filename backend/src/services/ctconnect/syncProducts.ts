@@ -43,6 +43,12 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
       const tipoCambio = Number(p.tipoCambio ?? 1)
       const costoPesos = Number((p.precio * (isUsd ? tipoCambio : 1)).toFixed(2))
 
+      // Calcular costo promocional si aplica
+      let costoPromocionPesos: number | null = null
+      if (p.precioPromocion && p.precioPromocion > 0) {
+        costoPromocionPesos = Number((p.precioPromocion * (isUsd ? tipoCambio : 1)).toFixed(2))
+      }
+
       const categoryPath = getProductCategoryPath(p)
 
       return {
@@ -55,7 +61,8 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
         categoria_id: categoryIds.get(categoryPath.join('/').toLowerCase()) ?? null,
         subcategoria: p.subcategoria,
         costo_ct:     costoPesos,
-        precio_publico: costoPesos,
+        costo_promocion: costoPromocionPesos,
+        precio_publico: costoPromocionPesos ?? costoPesos, // Valor inicial temporal, recalcular_precios_masivo aplicará la fórmula final
         existencia_total: existenciaTotal,
         peso_kg:      p.peso,
         dimensiones: {
@@ -70,6 +77,8 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
           ficha_tecnica: p.especificaciones_tecnicas || []
         },
         activo:       p.activo,
+        en_oferta:    costoPromocionPesos !== null,
+        fecha_fin_oferta: p.promocionVigenciaFin ? new Date(p.promocionVigenciaFin).toISOString() : null,
         descontinuado: false,
         fecha_actualizacion: new Date().toISOString(),
       }

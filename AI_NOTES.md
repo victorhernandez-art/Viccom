@@ -51,6 +51,14 @@ El proyecto consta de dos partes principales que interactúan con **Supabase** c
 *   **Texto y Acciones Abajo ([HeroBanner.tsx](file:///c:/xampp/htdocs/Viccom/components/home/HeroBanner.tsx)):** Para no tapar los detalles de las imágenes diseñadas del banner, el subtítulo, descripción y llamados a la acción se mantienen abajo del slider, con espaciados y tipografías refinadas y botones con bordes suavizados (`rounded-xl`).
 *   **Aspecto Responsivo y Controles:** Se optimizó el slider para usar una relación de aspecto de `aspect-[16/9] md:aspect-[3/1]` para una visualización correcta en móviles, y se estilizaron los controles de navegación (flechas en hover e indicadores dinámicos).
 
+### 5. Soporte de Promociones y Descuentos del Proveedor (CT Internacional)
+*   **Base de Datos SQL ([migration_promocion_proveedor.sql](file:///c:/xampp/htdocs/Viccom/database/migration_promocion_proveedor.sql)):**
+    *   Añadimos la columna `costo_promocion` en la tabla `products` para almacenar el costo de oferta.
+    *   Actualizamos la lógica de `recalcular_precios_masivo` y `calcular_precio_publico` en PostgreSQL. Si una promoción está vigente, se calcula `precio_publico` sobre el costo con descuento, y `precio_antes` (precio normal tachado) sobre el costo base (`costo_ct`), con `en_oferta = TRUE`.
+*   **Backend de Sincronización:**
+    *   **Parser ([processCatalog.ts](file:///c:/xampp/htdocs/Viccom/backend/src/services/ctconnect/processCatalog.ts)):** Mapeamos los datos de promociones de tipo importe y su fecha de fin del array `promociones`.
+    *   **Importación ([syncProducts.ts](file:///c:/xampp/htdocs/Viccom/backend/src/services/ctconnect/syncProducts.ts)):** Convertimos a pesos y guardamos `costo_promocion`, `fecha_fin_oferta` y `en_oferta` al hacer el upsert de los productos.
+
 ---
 
 ## ☁️ Guía Básica de Supabase para el Proyecto

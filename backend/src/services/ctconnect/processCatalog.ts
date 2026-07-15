@@ -23,6 +23,8 @@ export interface CTProduct {
   existencia:   CTAlmacen[]
   tipoCambio:   number
   especificaciones_tecnicas: any[]
+  precioPromocion?: number
+  promocionVigenciaFin?: string
 }
 
 /**
@@ -122,6 +124,19 @@ export async function processCatalog(filePath: string): Promise<CTProduct[]> {
     const categoriaPath = readCategoryPath(i)
     const specs = Array.isArray(i.especificaciones) ? i.especificaciones : []
 
+    let precioPromocion: number | undefined = undefined
+    let promocionVigenciaFin: string | undefined = undefined
+
+    if (Array.isArray(i.promociones) && i.promociones.length > 0) {
+      const promoImporte = i.promociones.find((p: any) => p.tipo === 'importe' && Number(p.promocion) > 0)
+      if (promoImporte) {
+        precioPromocion = Number(promoImporte.promocion)
+        if (promoImporte.vigencia?.fin) {
+          promocionVigenciaFin = String(promoImporte.vigencia.fin)
+        }
+      }
+    }
+
     return {
       clave:        String(i.clave ?? i.sku ?? ''),
       nombre:       String(i.nombre ?? i.descripcion ?? ''),
@@ -143,6 +158,8 @@ export async function processCatalog(filePath: string): Promise<CTProduct[]> {
       activo:       i.activo !== false,
       tipoCambio:   Number(i.tipoCambio ?? i.tipo_cambio ?? 1),
       especificaciones_tecnicas: specs,
+      precioPromocion,
+      promocionVigenciaFin,
       existencia: (i.existencia && typeof i.existencia === 'object' && !Array.isArray(i.existencia))
         ? Object.entries(i.existencia).map(([almacen, cantidad]) => ({
             almacen,
