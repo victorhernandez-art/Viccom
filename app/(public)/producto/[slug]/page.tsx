@@ -17,8 +17,7 @@ import {
   Warehouse,
 } from 'lucide-react'
 
-export const revalidate = 0 // Desactivar caché estática para stock y precios en tiempo real
-export const dynamic = 'force-dynamic'
+export const revalidate = 300 // Revalidar la caché en segundo plano cada 5 minutos para ahorrar ancho de banda y minutos de Netlify
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
