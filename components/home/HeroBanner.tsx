@@ -73,89 +73,104 @@ export default function HeroBanner() {
   const next = () => setCurrent(c => (c + 1) % slides.length)
 
   return (
-    <section className="bg-white py-4">
+    <section className="bg-white py-6">
       <div className="max-w-7xl mx-auto px-4">
-      {/* Imagen con márgenes acordes al contenido de la página */}
-      <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: '3/1' }}>
-        {/* Slides apilados con fade */}
-        {slides.map((s, i) => (
-          <div
-            key={s.id}
-            className={`absolute inset-0 transition-opacity duration-700 ${i === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-          >
-            <Image
-              src={s.image}
-              alt={s.title}
-              fill
-              className="object-cover"
-              priority={i === 0}
-              sizes="100vw"
-            />
-          </div>
-        ))}
+        {/* Contenedor del Slider con aspecto responsivo */}
+        <div className="relative w-full overflow-hidden rounded-2xl shadow-lg aspect-[16/9] md:aspect-[3/1]">
+          
+          {/* Slides apilados con fade */}
+          {slides.map((s, i) => (
+            <div
+              key={s.id}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                i === current ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
+            >
+              {/* Imagen de fondo */}
+              <Image
+                src={s.image}
+                alt={s.title}
+                fill
+                priority={i === 0}
+                className="object-cover object-center select-none"
+                sizes="(max-width: 1200px) 100vw, 1200px"
+              />
+              
+              {/* Capa de degradado oscuro para legibilidad superior */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent z-10" />
 
-        {/* Badge VICCOM - top left */}
-        <div className="absolute top-4 left-4 z-20">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-white shadow"
-            style={{ backgroundColor: slide.accent }}
-          >
-            <Tag className="w-3 h-3" />
-            <span>VICCOM — Distribuidora</span>
-          </div>
-        </div>
-
-        {/* Flechas de navegación */}
-        <button
-          onClick={prev}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/55 text-white rounded-full p-2 transition-all"
-          aria-label="Anterior"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          onClick={next}
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/55 text-white rounded-full p-2 transition-all"
-          aria-label="Siguiente"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
-        {/* Indicadores */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`h-2 rounded-full transition-all ${i === current ? 'bg-white w-6' : 'bg-white/50 w-2'}`}
-              aria-label={`Diapositiva ${i + 1}`}
-            />
+              {/* Contenido de la diapositiva superpuesto */}
+              <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-16 text-white z-20 select-none">
+                <span className="text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest text-red-400 mb-1.5 animate-pulse">
+                  {s.subtitle}
+                </span>
+                <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-2 md:mb-4 max-w-xs sm:max-w-md md:max-w-xl">
+                  {s.title}
+                </h2>
+                <p className="text-[11px] sm:text-sm md:text-base text-gray-200 line-clamp-2 md:line-clamp-3 mb-4 md:mb-6 max-w-xs sm:max-w-md md:max-w-lg leading-relaxed font-medium">
+                  {s.description}
+                </p>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={s.link}
+                    className="inline-flex items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-[11px] sm:text-xs md:text-sm text-white hover:scale-105 hover:shadow-lg transition-all focus:outline-none"
+                    style={{ backgroundColor: s.accent }}
+                  >
+                    {s.cta}
+                    <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </Link>
+                  <Link
+                    href="/catalogo"
+                    className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-sm bg-white/10 hover:bg-white/20 border border-white/10 hover:scale-105 transition-all text-white focus:outline-none"
+                  >
+                    Ver Catálogo
+                  </Link>
+                </div>
+              </div>
+            </div>
           ))}
-        </div>
-      </div>
 
-      {/* Zona inferior: subtítulo + descripción + botones */}
-      <div className="pt-4 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <p className="text-lg font-semibold text-[#1B2B6B]">{slide.subtitle}</p>
-            <p className="text-sm text-gray-500 mt-0.5">{slide.description}</p>
-          </div>
-          <div className="flex flex-wrap gap-3 flex-shrink-0">
-            <Link
-              href={slide.link}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-white transition-all hover:scale-105 hover:shadow-md"
-              style={{ backgroundColor: slide.accent }}
+          {/* Badge de la Marca - top left */}
+          <div className="absolute top-4 left-4 z-30">
+            <div
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider text-white shadow-md backdrop-blur-sm border border-white/10"
+              style={{ backgroundColor: `${slide.accent}d0` }} // Opacidad ligera para integrarse mejor
             >
-              {slide.cta}
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/catalogo"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#1B2B6B] border-2 border-[#1B2B6B]/30 hover:border-[#1B2B6B] transition-all"
-            >
-              Ver Catálogo Completo
-            </Link>
+              <Tag className="w-3 h-3" />
+              <span>VICCOM — Distribuidora</span>
+            </div>
           </div>
+
+          {/* Flechas de navegación (visibles solo en hover del contenedor) */}
+          <button
+            onClick={prev}
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-30 bg-black/20 hover:bg-black/60 text-white rounded-full p-2 sm:p-2.5 transition-all border border-white/5 opacity-0 hover:opacity-100 group-hover:opacity-100 focus:opacity-100 focus:outline-none"
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+          <button
+            onClick={next}
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-30 bg-black/20 hover:bg-black/60 text-white rounded-full p-2 sm:p-2.5 transition-all border border-white/5 opacity-0 hover:opacity-100 group-hover:opacity-100 focus:opacity-100 focus:outline-none"
+            aria-label="Siguiente"
+          >
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+
+          {/* Indicadores en la parte inferior */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`h-2 rounded-full transition-all duration-300 focus:outline-none ${
+                  i === current ? 'bg-white w-6' : 'bg-white/40 w-2 hover:bg-white/60'
+                }`}
+                aria-label={`Diapositiva ${i + 1}`}
+              />
+            ))}
+          </div>
+
         </div>
       </div>
     </section>
