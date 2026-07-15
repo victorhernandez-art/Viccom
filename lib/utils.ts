@@ -114,13 +114,11 @@ export function getAvailabilityLabel(existencia: number): {
 
 // ─── Stock de exhibición ─────────────────────────────────────────────────────
 export function getDisplayStock(slug: string, totalStock: number, tuxtlaStock: number) {
-  const demoSeed = Array.from(slug).reduce((sum, char) => sum + char.charCodeAt(0), 0)
-  const useDemoStock = totalStock > 0 && tuxtlaStock === 0 && demoSeed % 4 !== 0
-  const displayTuxtlaStock = useDemoStock ? Math.min(6 + (demoSeed % 8), totalStock) : tuxtlaStock
-  const displayOtherStock = useDemoStock ? Math.max(totalStock - displayTuxtlaStock, 0) : Math.max(totalStock - tuxtlaStock, 0)
+  const displayTuxtlaStock = tuxtlaStock
+  const displayOtherStock = Math.max(totalStock - tuxtlaStock, 0)
 
   return {
-    useDemoStock,
+    useDemoStock: false,
     displayTuxtlaStock,
     displayOtherStock,
     hasTuxtlaStock: displayTuxtlaStock > 0,
