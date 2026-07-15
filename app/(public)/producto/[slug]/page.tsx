@@ -17,7 +17,7 @@ import {
   Warehouse,
 } from 'lucide-react'
 
-export const revalidate = 300 // Revalidar la caché en segundo plano cada 5 minutos para ahorrar ancho de banda y minutos de Netlify
+export const revalidate = 300 // Revalidar la caché en segundo plano cada 5 minutos para ahorrar ancho de banda y optimizar el consumo en Vercel
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>

@@ -31,6 +31,7 @@ export default function IcecatSpecs({ upc, fichaTecnicaCt }: IcecatSpecsProps) {
   const [groups, setGroups] = useState<FeatureGroup[]>([])
   const [loading, setLoading] = useState(false)
   const [hasData, setHasData] = useState(false)
+  const [isIcecatData, setIsIcecatData] = useState(false)
 
   useEffect(() => {
     // Cargar ficha técnica de CT como fallback/inicial
@@ -45,9 +46,11 @@ export default function IcecatSpecs({ upc, fichaTecnicaCt }: IcecatSpecsProps) {
       }
       setGroups([ctGroup])
       setHasData(true)
+      setIsIcecatData(false)
     } else {
       setGroups([])
       setHasData(false)
+      setIsIcecatData(false)
     }
 
     if (!upc) return
@@ -74,6 +77,7 @@ export default function IcecatSpecs({ upc, fichaTecnicaCt }: IcecatSpecsProps) {
           if (validGroups.length > 0) {
             setGroups(validGroups)
             setHasData(true)
+            setIsIcecatData(true)
           }
         }
       } catch (err) {
@@ -105,7 +109,12 @@ export default function IcecatSpecs({ upc, fichaTecnicaCt }: IcecatSpecsProps) {
         </div>
         <div>
           <h2 className="text-xl font-bold text-[#1B2B6B]">Ficha Técnica Detallada</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Información técnica certificada provista por Open Icecat</p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {isIcecatData 
+              ? 'Información técnica certificada provista por Open Icecat' 
+              : 'Especificaciones técnicas de referencia provistas por CT'
+            }
+          </p>
         </div>
       </div>
 

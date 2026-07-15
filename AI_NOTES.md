@@ -42,6 +42,11 @@ El proyecto consta de dos partes principales que interactúan con **Supabase** c
 *   **Página del Producto ([page.tsx](file:///c:/xampp/htdocs/Viccom/app/\(public\)/producto/\[slug\]/page.tsx)):**
     *   Se acoplaron ambos componentes para que carguen de forma asíncrona al abrir un producto.
 
+### 3. Migración de Servidor de Despliegue (Netlify -> Vercel)
+*   **Eliminación de `netlify.toml`:** Se removió la configuración obsoleta de Netlify para evitar redundancias, ya que Vercel utiliza automáticamente el archivo `next.config.ts` para la optimización de imágenes y rutas.
+*   **Ajustes en Ficha de Producto ([page.tsx](file:///c:/xampp/htdocs/Viccom/app/\(public\)/producto/\[slug\]/page.tsx)):** Se modificó la documentación y comentarios internos para reflejar el uso del hosting en Vercel.
+*   **Ficha Técnica Dinámica ([IcecatSpecs.tsx](file:///c:/xampp/htdocs/Viccom/components/product/IcecatSpecs.tsx)):** Se adaptó el componente para que muestre de forma dinámica la procedencia de la información (Open Icecat en caso de éxito, o el fallback local de CT si la API falla).
+
 ---
 
 ## ☁️ Guía Básica de Supabase para el Proyecto
