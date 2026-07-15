@@ -88,9 +88,20 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const whatsapp  = settings['whatsapp_number'] ?? ''
   const waMsgBase = settings['whatsapp_message'] ?? 'Hola, me interesa cotizar el producto:'
 
-  const availability = getAvailabilityLabel(product.existencia_total)
+  // Calcular stock real en vivo sumando los almacenes de la tabla inventory
+  const tuxtlaStock = inventory
+    .filter((inv: any) => inv.almacen === 'TXA')
+    .reduce((sum: number, inv: any) => sum + Number(inv.existencia ?? 0), 0)
+
+  const otherStock = inventory
+    .filter((inv: any) => inv.almacen !== 'TXA')
+    .reduce((sum: number, inv: any) => sum + Number(inv.existencia ?? 0), 0)
+
+  const totalLiveStock = tuxtlaStock + otherStock
+
+  const availability = getAvailabilityLabel(totalLiveStock)
   const imageUrl     = getProductImageUrl(product.imagen_principal)
-  const stock = getDisplayStock(product.slug, product.existencia_total, product.existencia_tuxtla ?? 0)
+  const stock = getDisplayStock(product.slug, totalLiveStock, tuxtlaStock)
   const detailTone = stock.stockTone
 
   const waMessage = encodeURIComponent(
@@ -189,16 +200,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
             }`}>
               <Package className="w-4 h-4" />
               {availability.label}
-              {product.existencia_total > 0 && (
+              {totalLiveStock > 0 && (
                 <span className="text-xs font-normal">
-                  (Tuxtla {stock.displayTuxtlaStock} [Sobre pedido {stock.displayOtherStock}] · {product.existencia_total} uds.)
+                  (Tuxtla {stock.displayTuxtlaStock} [Sobre pedido {stock.displayOtherStock}] · {totalLiveStock} uds.)
                 </span>
               )}
             </div>
           </div>
 
           {/* Almacenes con existencia */}
-          {product.existencia_total > 0 && (
+          {totalLiveStock > 0 && (
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                 <Warehouse className="w-4 h-4" />
