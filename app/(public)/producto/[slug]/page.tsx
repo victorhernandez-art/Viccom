@@ -17,6 +17,9 @@ import {
   Warehouse,
 } from 'lucide-react'
 
+export const revalidate = 0 // Desactivar caché estática para stock y precios en tiempo real
+export const dynamic = 'force-dynamic'
+
 interface ProductPageProps {
   params: Promise<{ slug: string }>
 }
@@ -188,7 +191,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {availability.label}
               {product.existencia_total > 0 && (
                 <span className="text-xs font-normal">
-                  (TGZ {stock.displayTuxtlaStock} [{stock.displayOtherStock}] · {product.existencia_total} uds.)
+                  (Tuxtla {stock.displayTuxtlaStock} [Sobre pedido {stock.displayOtherStock}] · {product.existencia_total} uds.)
                 </span>
               )}
             </div>
