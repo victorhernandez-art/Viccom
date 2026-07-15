@@ -48,8 +48,8 @@ El proyecto consta de dos partes principales que interactúan con **Supabase** c
 *   **Ficha Técnica Dinámica ([IcecatSpecs.tsx](file:///c:/xampp/htdocs/Viccom/components/product/IcecatSpecs.tsx)):** Se adaptó el componente para que muestre de forma dinámica la procedencia de la información (Open Icecat en caso de éxito, o el fallback local de CT si la API falla).
 
 ### 4. Rediseño Premium del Banner Principal (HeroBanner)
-*   **Diseño Autocontenido ([HeroBanner.tsx](file:///c:/xampp/htdocs/Viccom/components/home/HeroBanner.tsx)):** Se eliminó el bloque de texto inferior para integrar el título, descripción y llamados a la acción directamente sobre el slider. Se utiliza un gradiente oscuro (`bg-gradient-to-r from-black/85 via-black/45 to-transparent`) que garantiza una legibilidad impecable sobre cualquier imagen de fondo.
-*   **Aspecto Responsivo:** Se actualizó a una proporción de `aspect-[16/9] md:aspect-[3/1]` junto con tipografía y botones adaptables según el dispositivo.
+*   **Texto y Acciones Abajo ([HeroBanner.tsx](file:///c:/xampp/htdocs/Viccom/components/home/HeroBanner.tsx)):** Para no tapar los detalles de las imágenes diseñadas del banner, el subtítulo, descripción y llamados a la acción se mantienen abajo del slider, con espaciados y tipografías refinadas y botones con bordes suavizados (`rounded-xl`).
+*   **Aspecto Responsivo y Controles:** Se optimizó el slider para usar una relación de aspecto de `aspect-[16/9] md:aspect-[3/1]` para una visualización correcta en móviles, y se estilizaron los controles de navegación (flechas en hover e indicadores dinámicos).
 
 ---
 
