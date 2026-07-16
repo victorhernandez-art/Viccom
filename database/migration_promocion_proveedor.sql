@@ -61,85 +61,127 @@ CREATE OR REPLACE FUNCTION recalcular_precios_masivo(
 ) RETURNS INTEGER AS $$
 DECLARE
   v_count          INTEGER := 0;
-  v_rec            RECORD;
   v_margen_global  NUMERIC;
-  v_nuevo_precio   NUMERIC;
-  v_nuevo_precio_antes NUMERIC;
-  v_nuevo_margen   NUMERIC;
-  v_costo_aplicado NUMERIC;
-  v_en_oferta      BOOLEAN;
 BEGIN
   -- Margen global
   SELECT value::NUMERIC INTO v_margen_global
   FROM settings WHERE key = 'margen_global';
 
-  FOR v_rec IN
-    SELECT
-      p.id,
-      p.nombre,
+  -- Realizar UPDATE y capturar filas modificadas usando RETURNING
+  WITH updated_rows AS (
+    UPDATE products p
+    SET 
+      precio_publico = ROUND(
+        (CASE 
+          WHEN p.costo_promocion IS NOT NULL AND (p.fecha_fin_oferta IS NULL OR p.fecha_fin_oferta > NOW()) THEN p.costo_promocion
+          ELSE p.costo_ct
+         END * 1.16) * (1 + COALESCE(
+           p.margen_override, 
+           (SELECT margen_override FROM categories WHERE id = p.categoria_id), 
+           v_margen_global, 
+           30
+         ) / 100), 
+        2
+      ),
+      precio_antes = CASE 
+        WHEN p.costo_promocion IS NOT NULL AND (p.fecha_fin_oferta IS NULL OR p.fecha_fin_oferta > NOW()) THEN 
+          ROUND((p.costo_ct * 1.16) * (1 + COALESCE(
+            p.margen_override, 
+            (SELECT margen_override FROM categories WHERE id = p.categoria_id), 
+            v_margen_global, 
+            30
+          ) / 100), 2)
+        ELSE NULL
+      END,
+      en_oferta = (p.costo_promocion IS NOT NULL AND (p.fecha_fin_oferta IS NULL OR p.fecha_fin_oferta > NOW())),
+      margen_aplicado = COALESCE(
+        p.margen_override, 
+        (SELECT margen_override FROM categories WHERE id = p.categoria_id), 
+        v_margen_global, 
+        30
+      ),
+      updated_at = NOW()
+    FROM (
+      -- Subconsulta para evaluar los valores viejos
+      SELECT 
+        id,
+        precio_publico AS precio_anterior,
+        precio_antes AS precio_antes_anterior,
+        margen_aplicado AS margen_anterior,
+        en_oferta AS en_oferta_anterior
+      FROM products
+    ) old
+    WHERE p.id = old.id
+      AND (p_categoria_id IS NULL OR p.categoria_id = p_categoria_id)
+      AND p.activo = TRUE
+      -- Solo actualizar si el precio, precio_antes, margen o estado de oferta cambiaron
+      AND (
+        ROUND(
+          (CASE 
+            WHEN p.costo_promocion IS NOT NULL AND (p.fecha_fin_oferta IS NULL OR p.fecha_fin_oferta > NOW()) THEN p.costo_promocion
+            ELSE p.costo_ct
+           END * 1.16) * (1 + COALESCE(
+             p.margen_override, 
+             (SELECT margen_override FROM categories WHERE id = p.categoria_id), 
+             v_margen_global, 
+             30
+           ) / 100), 
+          2
+        ) <> old.precio_anterior
+        OR COALESCE(
+          CASE 
+            WHEN p.costo_promocion IS NOT NULL AND (p.fecha_fin_oferta IS NULL OR p.fecha_fin_oferta > NOW()) THEN 
+              ROUND((p.costo_ct * 1.16) * (1 + COALESCE(
+                p.margen_override, 
+                (SELECT margen_override FROM categories WHERE id = p.categoria_id), 
+                v_margen_global, 
+                30
+              ) / 100), 2)
+            ELSE NULL
+          END, 
+          0
+        ) <> COALESCE(old.precio_antes_anterior, 0)
+        OR COALESCE(
+          p.margen_override, 
+          (SELECT margen_override FROM categories WHERE id = p.categoria_id), 
+          v_margen_global, 
+          30
+        ) <> old.margen_anterior
+        OR (p.costo_promocion IS NOT NULL AND (p.fecha_fin_oferta IS NULL OR p.fecha_fin_oferta > NOW())) <> old.en_oferta_anterior
+      )
+    RETURNING 
+      p.id, 
+      p.nombre, 
       p.sku_ct,
+      old.precio_anterior,
+      old.margen_anterior,
       p.costo_ct,
       p.costo_promocion,
       p.fecha_fin_oferta,
-      p.precio_publico  AS precio_anterior,
-      p.precio_antes    AS precio_antes_anterior,
-      p.margen_aplicado AS margen_anterior,
-      p.en_oferta       AS en_oferta_anterior,
-      p.margen_override,
-      c.margen_override AS margen_cat
-    FROM products p
-    LEFT JOIN categories c ON p.categoria_id = c.id
-    WHERE (p_categoria_id IS NULL OR p.categoria_id = p_categoria_id)
-      AND p.activo = TRUE
-  LOOP
-    v_nuevo_margen := COALESCE(v_rec.margen_override, v_rec.margen_cat, v_margen_global, 30);
-    
-    -- Determinar si la oferta está vigente
-    IF v_rec.costo_promocion IS NOT NULL AND (v_rec.fecha_fin_oferta IS NULL OR v_rec.fecha_fin_oferta > NOW()) THEN
-      v_costo_aplicado := v_rec.costo_promocion;
-      v_en_oferta      := TRUE;
-      v_nuevo_precio_antes := ROUND((v_rec.costo_ct * 1.16) * (1 + v_nuevo_margen / 100), 2);
-    ELSE
-      v_costo_aplicado := v_rec.costo_ct;
-      v_en_oferta      := FALSE;
-      v_nuevo_precio_antes := NULL;
-    END IF;
+      p.margen_aplicado AS margen_nuevo,
+      p.precio_publico AS precio_nuevo
+  )
+  -- Insertar en el historial a partir de las filas modificadas
+  INSERT INTO price_history (
+    product_id, producto_nombre, sku_ct,
+    costo_anterior, margen_anterior, precio_anterior,
+    costo_nuevo,    margen_nuevo,    precio_nuevo,
+    motivo, usuario
+  )
+  SELECT 
+    u.id, u.nombre, u.sku_ct,
+    u.precio_anterior / 1.16 / NULLIF((1 + u.margen_anterior / 100), 0),
+    u.margen_anterior, u.precio_anterior,
+    CASE 
+      WHEN u.costo_promocion IS NOT NULL AND (u.fecha_fin_oferta IS NULL OR u.fecha_fin_oferta > NOW()) THEN u.costo_promocion
+      ELSE u.costo_ct
+    END, 
+    u.margen_nuevo, u.precio_nuevo,
+    p_motivo, p_usuario
+  FROM updated_rows u;
 
-    v_nuevo_precio := ROUND((v_costo_aplicado * 1.16) * (1 + v_nuevo_margen / 100), 2);
-
-    -- Solo actualizar si hay algún cambio real
-    IF v_nuevo_precio <> v_rec.precio_anterior 
-       OR COALESCE(v_nuevo_precio_antes, 0) <> COALESCE(v_rec.precio_antes_anterior, 0)
-       OR v_nuevo_margen <> v_rec.margen_anterior 
-       OR v_en_oferta <> v_rec.en_oferta_anterior THEN
-       
-      UPDATE products
-      SET precio_publico = v_nuevo_precio,
-          precio_antes = v_nuevo_precio_antes,
-          en_oferta = v_en_oferta,
-          margen_aplicado = v_nuevo_margen,
-          updated_at = NOW()
-      WHERE id = v_rec.id;
-
-      -- Registrar en historial (ajustando costo_anterior para obtener el neto sin IVA)
-      INSERT INTO price_history (
-        product_id, producto_nombre, sku_ct,
-        costo_anterior, margen_anterior, precio_anterior,
-        costo_nuevo,    margen_nuevo,    precio_nuevo,
-        motivo, usuario
-      )
-      VALUES (
-        v_rec.id, v_rec.nombre, v_rec.sku_ct,
-        v_rec.precio_anterior / 1.16 / NULLIF((1 + v_rec.margen_anterior / 100), 0),
-        v_rec.margen_anterior, v_rec.precio_anterior,
-        v_costo_aplicado, v_nuevo_margen, v_nuevo_precio,
-        p_motivo, p_usuario
-      );
-
-      v_count := v_count + 1;
-    END IF;
-  END LOOP;
-
+  -- Contar cuántos se modificaron
+  GET DIAGNOSTICS v_count = ROW_COUNT;
   RETURN v_count;
 END;
 $$ LANGUAGE plpgsql;
