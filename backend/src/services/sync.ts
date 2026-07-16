@@ -62,7 +62,11 @@ export async function runFullSync(): Promise<void> {
 
   } catch (err) {
     logData.estado       = 'error'
-    logData.error_detalle = err instanceof Error ? `${err.message}\n${err.stack}` : String(err)
+    logData.error_detalle = err instanceof Error 
+      ? `${err.message}\n${err.stack}` 
+      : (typeof err === 'object' && err !== null 
+          ? JSON.stringify(err, null, 2) 
+          : String(err))
     logData.mensaje      = 'Error durante la sincronización.'
     logger.error(`[${proceso}] Sync failed`, { error: logData.error_detalle })
   } finally {
