@@ -189,10 +189,30 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </p>
 
           {/* Precio */}
-          <div className="bg-gradient-to-r from-[#1B2B6B] to-[#253680] rounded-xl p-5 text-white">
+          <div className="bg-gradient-to-r from-[#1B2B6B] to-[#253680] rounded-xl p-5 text-white relative overflow-hidden">
+            {product.en_oferta && (
+              <div className="absolute top-0 right-0 bg-[#CC0000] text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider shadow-sm">
+                Promoción
+              </div>
+            )}
             <p className="text-sm text-blue-200 mb-1">Precio público</p>
-            <p className="text-4xl font-extrabold">{formatCurrency(product.precio_publico)}</p>
-            <p className="text-xs text-blue-200 mt-1">IVA incluido · Precio sujeto a cambio sin previo aviso</p>
+            {product.en_oferta && product.precio_antes ? (
+              <div className="space-y-1">
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <p className="text-4xl font-extrabold text-[#FF4D4D]">{formatCurrency(product.precio_publico)}</p>
+                  <p className="text-lg text-blue-200/70 line-through decoration-red-500/80 decoration-2">{formatCurrency(product.precio_antes)}</p>
+                </div>
+                {product.fecha_fin_oferta && (
+                  <p className="text-xs text-red-200/90 flex items-center gap-1.5 pt-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Vigencia hasta el {formatDate(product.fecha_fin_oferta)}</span>
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-4xl font-extrabold">{formatCurrency(product.precio_publico)}</p>
+            )}
+            <p className="text-xs text-blue-200/80 mt-2">IVA incluido · Precio sujeto a cambio sin previo aviso</p>
           </div>
 
           {/* Disponibilidad */}
