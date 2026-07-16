@@ -199,7 +199,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {product.en_oferta && product.precio_antes ? (
               <div className="space-y-1">
                 <div className="flex items-baseline gap-3 flex-wrap">
-                  <p className="text-4xl font-extrabold text-[#FF4D4D]">{formatCurrency(product.precio_publico)}</p>
+                  <p className="text-4xl font-extrabold text-white">{formatCurrency(product.precio_publico)}</p>
                   <p className="text-lg text-blue-200/70 line-through decoration-red-500/80 decoration-2">{formatCurrency(product.precio_antes)}</p>
                 </div>
                 {product.fecha_fin_oferta && (
