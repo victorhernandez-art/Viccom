@@ -16,6 +16,15 @@ async function test() {
     console.error('Error al ejecutar RPC:', error)
   } else {
     console.log('Éxito! Precios actualizados:', data)
+    
+    // Consultar el producto Dell para ver si su precio cambió a la oferta
+    const { data: prod } = await supabase
+      .from('products')
+      .select('sku_ct, costo_ct, costo_promocion, precio_publico, precio_antes, en_oferta')
+      .eq('sku_ct', 'COMDDL9040')
+      .single()
+    
+    console.log('Producto Dell tras recálculo:', prod)
   }
 }
 
