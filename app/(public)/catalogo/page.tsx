@@ -113,7 +113,31 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
                                          .order('existencia_total', { ascending: false })
   }
 
-  const { data, count, error } = await query.range(offset, offset + PAGE_SIZE - 1)
+  let { data, count, error } = await query.range(offset, offset + PAGE_SIZE - 1)
+
+  // Fallback: Si se filtró por destacados pero no hay ninguno marcado en la base de datos,
+  // mostrar productos relevantes en existencia para no mostrar la sección vacía
+  if (filters.destacado && (!data || data.length === 0)) {
+    let fallbackQuery = supabase
+      .from('v_products_catalog')
+      .select('*', { count: 'exact' })
+      .gt('existencia_total', 0)
+
+    if (filters.precio_min) fallbackQuery = fallbackQuery.gte('precio_publico', filters.precio_min)
+    if (filters.precio_max) fallbackQuery = fallbackQuery.lte('precio_publico', filters.precio_max)
+    if (filters.query)      fallbackQuery = fallbackQuery.ilike('nombre', `%${filters.query}%`)
+
+    fallbackQuery = fallbackQuery
+      .order('existencia_total', { ascending: false })
+      .order('fecha_actualizacion', { ascending: false })
+
+    const fallbackRes = await fallbackQuery.range(offset, offset + PAGE_SIZE - 1)
+    if (!fallbackRes.error && fallbackRes.data && fallbackRes.data.length > 0) {
+      data = fallbackRes.data
+      count = fallbackRes.count
+    }
+  }
+
   const products   = (data ?? []) as ProductCatalog[]
   const total      = count ?? 0
   const totalPages = Math.ceil(total / PAGE_SIZE)
