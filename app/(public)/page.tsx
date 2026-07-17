@@ -42,7 +42,18 @@ export default async function HomePage() {
       .select('*')
       .eq('en_oferta', true)
       .gt('existencia_total', 0)
-      .in('categoria_slug', ['laptops', 'impresoras', 'almacenamiento', 'accesorios'])
+      .in('categoria_slug', [
+        'computadoras-laptops',
+        'computadoras-gaming-laptops-gaming',
+        'impresion-multifuncionales',
+        'impresion-impresoras',
+        'almacenamiento-ssd',
+        'accesorios-para-componentes-mouse',
+        'accesorios-para-componentes-teclados',
+        'accesorios-gaming-mouse-gaming',
+        'accesorios-gaming-teclados-gaming',
+        'accesorios-para-componentes-kits-para-teclado-y-mouse'
+      ])
       .order('destacado', { ascending: false })
       .order('precio_publico', { ascending: false })
       .limit(12),
