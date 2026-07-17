@@ -46,8 +46,7 @@ export default async function HomePage() {
       .gt('existencia_total', 0)
       .in('categoria_slug', ['computadoras-laptops', 'computadoras-gaming-laptops-gaming'])
       .lte('precio_publico', 25000)
-      .order('precio_publico', { ascending: false })
-      .limit(4),
+      .limit(60),
 
     // 2. Otros accesorios y equipos en oferta comunes (Mouses, Teclados, SSDs, Impresoras)
     supabase
@@ -65,9 +64,7 @@ export default async function HomePage() {
         'accesorios-gaming-teclados-gaming',
         'accesorios-para-componentes-kits-para-teclado-y-mouse'
       ])
-      .order('destacado', { ascending: false })
-      .order('precio_publico', { ascending: false })
-      .limit(10),
+      .limit(100),
 
     supabase
       .from('settings')
@@ -78,9 +75,41 @@ export default async function HomePage() {
   const categories    = (categoriesRes.data ?? []) as Category[]
   const featuredProds = (featuredRes.data  ?? []) as ProductCatalog[]
   
+  // Rotación dinámica cada 24 horas basada en la fecha del día actual
+  const rawLaptops = (laptopsRes.data ?? []) as ProductCatalog[]
+  const rawOthers  = (othersRes.data  ?? []) as ProductCatalog[]
+
+  const todayStr = new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+  
+  // LCG (Linear Congruential Generator) simple para barajar de forma determinista por día
+  const createRandom = (seedStr: string) => {
+    let seed = 0
+    for (let i = 0; i < seedStr.length; i++) {
+      seed = (seed << 5) - seed + seedStr.charCodeAt(i)
+      seed |= 0
+    }
+    return () => {
+      seed = (seed * 9301 + 49297) % 233280
+      return seed / 233280
+    }
+  }
+
+  const randLaptops = createRandom(todayStr + '_laptops_viccom')
+  const randOthers  = createRandom(todayStr + '_others_viccom')
+
+  function shuffle<T>(array: T[], randomFn: () => number): T[] {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(randomFn() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
+  const laptopsPool = shuffle(rawLaptops, randLaptops)
+  const othersPool  = shuffle(rawOthers, randOthers)
+
   // Intercalar Laptops <= $25k y Accesorios para dar variedad y precios accesibles
-  const laptopsPool = (laptopsRes.data ?? []) as ProductCatalog[]
-  const othersPool  = (othersRes.data  ?? []) as ProductCatalog[]
   const offersProds: ProductCatalog[]  = []
   const maxLen = Math.max(laptopsPool.length, othersPool.length)
   
