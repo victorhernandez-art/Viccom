@@ -58,20 +58,15 @@ export default function BrandsMarquee() {
             {marqueeBrands.map((brand, idx) => (
               <div 
                 key={idx} 
-                className="group flex flex-col items-center justify-center gap-2 cursor-pointer hover:scale-105 transition-transform duration-300"
+                className="group flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300"
                 title={brand.name}
               >
                 <img 
                   src={`/img/marcas/${brand.slug}.png`} 
                   alt={`${brand.name} logo`}
-                  className={`h-8 ${brand.width} object-contain`}
+                  className={`h-14 ${brand.width} object-contain`}
                   loading="lazy"
                 />
-                
-                {/* Nombre de la marca abajo */}
-                <span className="text-[10px] uppercase font-bold tracking-widest text-gray-400 group-hover:text-gray-900 transition-colors duration-300">
-                  {brand.name}
-                </span>
               </div>
             ))}
           </div>
@@ -89,7 +84,7 @@ export default function BrandsMarquee() {
           }
         }
         .animate-marquee {
-          animation: marquee 45s linear infinite;
+          animation: marquee 75s linear infinite;
         }
         .animate-marquee:hover {
           animation-play-state: paused;
