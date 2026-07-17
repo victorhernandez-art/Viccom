@@ -4,21 +4,36 @@ import React from 'react'
 
 export default function BrandsMarquee() {
   const brands = [
-    { name: 'HP', slug: 'hp', width: 'w-16' },
-    { name: 'Dell', slug: 'dell', width: 'w-16' },
-    { name: 'Lenovo', slug: 'lenovo', width: 'w-20' },
-    { name: 'Asus', slug: 'asus', width: 'w-20' },
-    { name: 'Samsung', slug: 'samsung', width: 'w-20' },
+    { name: 'HP', slug: 'hp', width: 'w-14' },
+    { name: 'Dell', slug: 'dell', width: 'w-14' },
+    { name: 'Lenovo', slug: 'lenovo', width: 'w-18' },
+    { name: 'Asus', slug: 'asus-business', width: 'w-20' },
     { name: 'Intel', slug: 'intel', width: 'w-16' },
     { name: 'AMD', slug: 'amd', width: 'w-16' },
-    { name: 'Epson', slug: 'epson', width: 'w-20' },
-    { name: 'Logitech', slug: 'logitech', width: 'w-20' },
-    { name: 'Kingston', slug: 'kingston', width: 'w-20' },
-    { name: 'TP-Link', slug: 'tplink', width: 'w-20' },
+    { name: 'Epson', slug: 'epson', width: 'w-18' },
+    { name: 'Logitech', slug: 'logitech', width: 'w-18' },
+    { name: 'Kingston Technology', slug: 'kingston technology', width: 'w-24' },
+    { name: 'TP-Link', slug: 'tp-link', width: 'w-20' },
     { name: 'Acer', slug: 'acer', width: 'w-16' },
-    { name: 'Western Digital', slug: 'wd', width: 'w-20' },
     { name: 'ADATA', slug: 'adata', width: 'w-20' },
-    { name: 'Gigabyte', slug: 'gigabyte', width: 'w-20' }
+    { name: 'Gigabyte', slug: 'gigabyte', width: 'w-20' },
+    { name: 'Xerox', slug: 'xerox', width: 'w-20' },
+    { name: 'Canon', slug: 'canon', width: 'w-16' },
+    { name: 'Brother', slug: 'brother', width: 'w-20' },
+    { name: 'Cisco', slug: 'cisco', width: 'w-16' },
+    { name: 'APC', slug: 'apc', width: 'w-16' },
+    { name: 'Dahua', slug: 'dahua technology', width: 'w-24' },
+    { name: 'Hikvision', slug: 'hikvision', width: 'w-24' },
+    { name: 'LG', slug: 'lg', width: 'w-12' },
+    { name: 'Hisense', slug: 'hisense', width: 'w-20' },
+    { name: 'Microsoft', slug: 'microsoft', width: 'w-20' },
+    { name: 'Vorago', slug: 'vorago', width: 'w-16' },
+    { name: 'Acteck', slug: 'acteck', width: 'w-16' },
+    { name: 'BenQ', slug: 'benq', width: 'w-16' },
+    { name: 'CDP', slug: 'cdp', width: 'w-16' },
+    { name: 'Koblenz', slug: 'koblenz', width: 'w-20' },
+    { name: 'Kyocera', slug: 'kyocera', width: 'w-20' },
+    { name: 'Manhattan', slug: 'manhattan', width: 'w-20' }
   ]
 
   // Duplicar la lista para lograr un scroll infinito fluido
@@ -46,20 +61,10 @@ export default function BrandsMarquee() {
                 className="group flex flex-col items-center justify-center gap-2 cursor-pointer hover:scale-105 transition-transform duration-300"
                 title={brand.name}
               >
-                {/* Cargará los logos locales con su color original */}
                 <img 
                   src={`/img/marcas/${brand.slug}.png`} 
                   alt={`${brand.name} logo`}
                   className={`h-8 ${brand.width} object-contain`}
-                  onError={(e) => {
-                    // Si no encuentra el PNG, intentar con JPG o SVG de fallback
-                    const target = e.target as HTMLImageElement
-                    if (target.src.endsWith('.png')) {
-                      target.src = `/img/marcas/${brand.slug}.svg`
-                    } else if (target.src.endsWith('.svg')) {
-                      target.src = `/img/marcas/${brand.slug}.jpg`
-                    }
-                  }}
                   loading="lazy"
                 />
                 
@@ -84,7 +89,7 @@ export default function BrandsMarquee() {
           }
         }
         .animate-marquee {
-          animation: marquee 25s linear infinite;
+          animation: marquee 45s linear infinite;
         }
         .animate-marquee:hover {
           animation-play-state: paused;
