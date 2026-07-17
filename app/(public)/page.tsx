@@ -21,7 +21,8 @@ export default async function HomePage() {
   const supabase = await createClient()
 
   // Obtener datos en paralelo
-  const [categoriesRes, featuredRes, offersRes, settingsRes] = await Promise.all([
+  // Obtener datos en paralelo
+  const [categoriesRes, featuredRes, laptopsRes, othersRes, settingsRes] = await Promise.all([
     supabase
       .from('categories')
       .select('*')
@@ -37,14 +38,24 @@ export default async function HomePage() {
       .order('fecha_actualizacion', { ascending: false })
       .limit(10),
 
+    // 1. Laptops baratas en oferta (precio de venta final <= $25,000 MXN)
+    supabase
+      .from('v_products_catalog')
+      .select('*')
+      .eq('en_oferta', true)
+      .gt('existencia_total', 0)
+      .in('categoria_slug', ['computadoras-laptops', 'computadoras-gaming-laptops-gaming'])
+      .lte('precio_publico', 25000)
+      .order('precio_publico', { ascending: false })
+      .limit(4),
+
+    // 2. Otros accesorios y equipos en oferta comunes (Mouses, Teclados, SSDs, Impresoras)
     supabase
       .from('v_products_catalog')
       .select('*')
       .eq('en_oferta', true)
       .gt('existencia_total', 0)
       .in('categoria_slug', [
-        'computadoras-laptops',
-        'computadoras-gaming-laptops-gaming',
         'impresion-multifuncionales',
         'impresion-impresoras',
         'almacenamiento-ssd',
@@ -56,17 +67,36 @@ export default async function HomePage() {
       ])
       .order('destacado', { ascending: false })
       .order('precio_publico', { ascending: false })
-      .limit(12),
+      .limit(10),
 
     supabase
       .from('settings')
       .select('key,value')
       .in('key', ['whatsapp_number']),
-  ]) as [any, any, any, any]
+  ]) as [any, any, any, any, any]
 
-  const categories   = (categoriesRes.data ?? []) as Category[]
+  const categories    = (categoriesRes.data ?? []) as Category[]
   const featuredProds = (featuredRes.data  ?? []) as ProductCatalog[]
-  const offersProds   = (offersRes.data    ?? []) as ProductCatalog[]
+  
+  // Intercalar Laptops <= $25k y Accesorios para dar variedad y precios accesibles
+  const laptopsPool = (laptopsRes.data ?? []) as ProductCatalog[]
+  const othersPool  = (othersRes.data  ?? []) as ProductCatalog[]
+  const offersProds: ProductCatalog[]  = []
+  const maxLen = Math.max(laptopsPool.length, othersPool.length)
+  
+  for (let i = 0; i < maxLen; i++) {
+    if (laptopsPool[i]) {
+      offersProds.push(laptopsPool[i])
+    }
+    if (othersPool[i * 2]) {
+      offersProds.push(othersPool[i * 2])
+    }
+    if (othersPool[i * 2 + 1]) {
+      offersProds.push(othersPool[i * 2 + 1])
+    }
+  }
+
+  const finalOffersProds = offersProds.slice(0, 12)
 
   const settings     = Object.fromEntries(
     (settingsRes.data ?? []).map((s: any) => [s.key, s.value])
@@ -89,9 +119,9 @@ export default async function HomePage() {
         />
       )}
 
-      {offersProds.length > 0 && (
+      {finalOffersProds.length > 0 && (
         <FeaturedProducts
-          products={offersProds}
+          products={finalOffersProds}
           title="Ofertas Especiales"
           subtitle="Aprovecha los mejores precios"
           viewAllLink="/catalogo?en_oferta=true"
