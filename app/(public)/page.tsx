@@ -48,7 +48,7 @@ export default async function HomePage() {
       .lte('precio_publico', 25000)
       .limit(60),
 
-    // 2. Otros accesorios y equipos en oferta comunes (Mouses, Teclados, SSDs, Impresoras)
+    // 2. Otros accesorios y equipos en oferta comunes (Mouses, Teclados, SSDs, Impresoras, Monitores, NoBreaks, Mochilas, Audífonos, etc.)
     supabase
       .from('v_products_catalog')
       .select('*')
@@ -62,9 +62,21 @@ export default async function HomePage() {
         'accesorios-para-componentes-teclados',
         'accesorios-gaming-mouse-gaming',
         'accesorios-gaming-teclados-gaming',
-        'accesorios-para-componentes-kits-para-teclado-y-mouse'
+        'accesorios-para-componentes-kits-para-teclado-y-mouse',
+        'ensamble-monitores',
+        'computadoras-gaming-monitores-gaming',
+        'respaldo-y-regulacion-no-breaks-y-ups',
+        'accesorios-para-computo-mochilas-y-maletines',
+        'computadoras-pcs-de-escritorio',
+        'computadoras-all-in-one',
+        'computadoras-tabletas',
+        'accesorios-para-electronica-audifonos',
+        'accesorios-para-electronica-diademas',
+        'electronica-auriculares',
+        'accesorios-gaming-gabinetes-gaming',
+        'electronica-proyectores'
       ])
-      .limit(100),
+      .limit(150),
 
     supabase
       .from('settings')
