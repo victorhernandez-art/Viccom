@@ -6,129 +6,88 @@ export default function BrandsMarquee() {
   const brands = [
     {
       name: 'HP',
-      color: '#0096D6',
-      logo: (
-        <svg className="h-7 w-auto fill-current" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="2" fill="none" />
-          <path d="M9.5 7v10h1.5v-4h2v4h1.5V7H13v3.5h-2V7H9.5z" />
-        </svg>
-      )
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg',
+      width: 'w-10'
     },
     {
       name: 'Dell',
-      color: '#007DB8',
-      logo: (
-        <svg className="h-7 w-auto fill-current" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="2" fill="none" />
-          <path d="M7.5 8h2.5c1.5 0 2.2.7 2.2 1.8 0 .8-.4 1.4-1.2 1.6.8.2 1.3.8 1.3 1.7 0 1.2-.8 1.9-2.3 1.9H7.5V8zm1.5 3h1c.6 0 1-.3 1-.9 0-.5-.4-.9-1-.9h-1V11zm0 3h1.2c.6 0 1-.3 1-.9 0-.6-.4-.9-1-.9h-1.2V14z" />
-        </svg>
-      )
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/18/Dell_logo_2016.svg',
+      width: 'w-16'
     },
     {
       name: 'Lenovo',
-      color: '#E2231A',
-      logo: (
-        <svg className="h-6 w-auto fill-current" viewBox="0 0 36 12">
-          <rect x="0" y="0" width="36" height="12" fill="currentColor" rx="2" />
-          <text x="18" y="9.5" fill="#FFF" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">Lenovo</text>
-        </svg>
-      )
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Lenovo_logo_2015.svg',
+      width: 'w-20'
     },
     {
       name: 'Asus',
-      color: '#00539B',
-      logo: (
-        <svg className="h-5 w-auto fill-current" viewBox="0 0 40 10">
-          <text x="20" y="8.5" fontSize="10" fontWeight="900" fontStyle="italic" letterSpacing="1" textAnchor="middle" fontFamily="sans-serif">ASUS</text>
-        </svg>
-      )
-    },
-    {
-      name: 'Intel',
-      color: '#0071C5',
-      logo: (
-        <svg className="h-6 w-auto fill-current" viewBox="0 0 28 12">
-          <ellipse cx="14" cy="6" rx="13" ry="5.5" stroke="currentColor" strokeWidth="1" fill="none" transform="rotate(-10 14 6)" />
-          <text x="14" y="9" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">intel</text>
-        </svg>
-      )
-    },
-    {
-      name: 'Kingston',
-      color: '#FF0000',
-      logo: (
-        <svg className="h-6 w-auto fill-current" viewBox="0 0 40 12">
-          <path d="M5 2h2v8H5zm4 0h3c1.5 0 2.5 1 2.5 2.5S13.5 7 12 7H9v3H7.5V2zm1.5 3.5h1.5c.6 0 1-.3 1-.8s-.4-.8-1-.8h-1.5v1.6zm6.5-3.5h2.5l2 3.5 2-3.5h2.5v8H22V5.5l-2.5 4.5h-1L16 5.5v4.5h-1.5V2z" />
-          <text x="28" y="10" fontSize="8" fontWeight="bold" fontFamily="sans-serif">Kingston</text>
-        </svg>
-      )
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Asus_Logo.svg',
+      width: 'w-24'
     },
     {
       name: 'Samsung',
-      color: '#0A1172',
-      logo: (
-        <svg className="h-5 w-auto fill-current" viewBox="0 0 48 10">
-          <ellipse cx="24" cy="5" rx="23" ry="4.5" fill="currentColor" />
-          <text x="24" y="8" fill="#FFF" fontSize="7" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.5">SAMSUNG</text>
-        </svg>
-      )
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg',
+      width: 'w-24'
     },
     {
-      name: 'Epson',
-      color: '#003399',
-      logo: (
-        <svg className="h-5 w-auto fill-current" viewBox="0 0 32 10">
-          <text x="16" y="8.5" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif" letterSpacing="1">EPSON</text>
-        </svg>
-      )
-    },
-    {
-      name: 'Logitech',
-      color: '#00B8FC',
-      logo: (
-        <svg className="h-6 w-auto fill-current" viewBox="0 0 36 12">
-          <path d="M4 2v8h4.5V8.5H5.5V2H4zm6.5 0c-2.2 0-3.5 1.5-3.5 4s1.3 4 3.5 4 3.5-1.5 3.5-4-1.3-4-3.5-4zm0 6.5c-1.2 0-2-1-2-2.5s.8-2.5 2-2.5 2 1 2 2.5-.8 2.5-2 2.5z" />
-          <text x="24" y="10" fontSize="8" fontWeight="bold" fontFamily="sans-serif">logi</text>
-        </svg>
-      )
-    },
-    {
-      name: 'Acer',
-      color: '#83B81A',
-      logo: (
-        <svg className="h-5 w-auto fill-current" viewBox="0 0 28 10">
-          <text x="14" y="8.5" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.5">acer</text>
-        </svg>
-      )
+      name: 'Intel',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Intel_logo_%282020%29.svg',
+      width: 'w-16'
     },
     {
       name: 'AMD',
-      color: '#000000',
-      logo: (
-        <svg className="h-5 w-auto fill-current" viewBox="0 0 28 10">
-          <path d="M2 2h8v2H4v2h6v2H2V2z" fill="currentColor" />
-          <text x="19" y="8.5" fontSize="9" fontWeight="bold" fontFamily="sans-serif">AMD</text>
-        </svg>
-      )
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/AMD_Logo.svg',
+      width: 'w-16'
+    },
+    {
+      name: 'Epson',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Epson_logo.svg',
+      width: 'w-20'
+    },
+    {
+      name: 'Logitech',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Logitech_logo_and_wordmark.svg',
+      width: 'w-24'
+    },
+    {
+      name: 'Kingston',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Kingston_Technology_logo.svg',
+      width: 'w-24'
     },
     {
       name: 'TP-Link',
-      color: '#19C1D8',
-      logo: (
-        <svg className="h-5 w-auto fill-current" viewBox="0 0 36 10">
-          <text x="18" y="8.5" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">tp-link</text>
-        </svg>
-      )
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/TP-Link_logo.svg',
+      width: 'w-24'
+    },
+    {
+      name: 'Acer',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/00/Acer_2011.svg',
+      width: 'w-20'
+    },
+    {
+      name: 'Western Digital',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/db/Western_Digital_logo.svg',
+      width: 'w-20'
+    },
+    {
+      name: 'ADATA',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/ADATA_Logo.svg',
+      width: 'w-24'
+    },
+    {
+      name: 'Gigabyte',
+      logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Gigabyte_Technology_logo.svg',
+      width: 'w-28'
     }
   ]
 
-  // Duplicar la lista para lograr un scroll infinito fluido
+  // Duplicar la lista para lograr un scroll infinito fluido sin cortes
   const marqueeBrands = [...brands, ...brands, ...brands]
 
   return (
     <section className="py-12 bg-white overflow-hidden border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4 mb-6 text-center">
-        <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold">
+        <h3 className="text-xs uppercase tracking-widest text-gray-400 font-bold">
           Trabajamos con las mejores marcas globales
         </h3>
       </div>
@@ -144,13 +103,15 @@ export default function BrandsMarquee() {
             {marqueeBrands.map((brand, idx) => (
               <div 
                 key={idx} 
-                className="group flex items-center justify-center text-gray-400 hover:scale-110 transition-all duration-300 cursor-pointer"
-                style={{ '--brand-hover-color': brand.color } as React.CSSProperties}
+                className="group flex items-center justify-center filter grayscale opacity-50 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
                 title={brand.name}
               >
-                <div className="group-hover:text-[var(--brand-hover-color)] transition-colors duration-300">
-                  {brand.logo}
-                </div>
+                <img 
+                  src={brand.logoUrl} 
+                  alt={`${brand.name} logo`}
+                  className={`h-8 ${brand.width} object-contain`}
+                  loading="lazy"
+                />
               </div>
             ))}
           </div>
