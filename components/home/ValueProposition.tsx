@@ -5,7 +5,7 @@ const features = [
   {
     icon: <Truck className="w-6 h-6" />,
     title: 'Entrega Rápida',
-    desc: 'En Tuxtla Gutiérrez el envío es sin costo; para otros municipios de Chiapas, el costo se calcula según el destino',
+    desc: 'En Tuxtla Gutiérrez el envío es gratis a partir de $600 MXN. Para otros municipios de Chiapas, el costo se calcula según el destino.',
     color: 'text-blue-600',
     bg: 'bg-blue-50',
   },
