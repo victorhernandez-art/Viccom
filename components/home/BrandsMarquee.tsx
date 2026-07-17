@@ -36,9 +36,6 @@ export default function BrandsMarquee() {
     { name: 'Manhattan', slug: 'manhattan' }
   ]
 
-  // Duplicar la lista para lograr un scroll infinito fluido
-  const marqueeBrands = [...brands, ...brands, ...brands]
-
   return (
     <section className="py-12 bg-white overflow-hidden border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4 mb-6 text-center">
@@ -47,25 +44,44 @@ export default function BrandsMarquee() {
         </h3>
       </div>
       
-      <div className="relative w-full flex items-center">
+      <div className="relative w-full flex items-center overflow-hidden">
         {/* Degradados laterales para dar profundidad */}
         <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-        {/* Contenedor del Marquee */}
-        <div className="flex w-full overflow-hidden">
-          <div className="flex gap-16 md:gap-24 py-4 animate-marquee whitespace-nowrap">
-            {marqueeBrands.map((brand, idx) => (
+        {/* Carrusel de doble pista con min-w-full y shrink-0 para evitar colapso a 0 de ancho */}
+        <div className="flex w-full overflow-hidden select-none">
+          {/* Pista 1 */}
+          <div className="flex shrink-0 items-center justify-around gap-16 md:gap-24 py-4 animate-marquee min-w-full">
+            {brands.map((brand, idx) => (
               <div 
-                key={idx} 
-                className="group flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300"
+                key={`p1-${idx}`} 
+                className="flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300"
                 title={brand.name}
               >
-                {/* Usamos un alto fijo en px inline para garantizar visualización sin depender de clases de Tailwind inexistentes */}
                 <img 
                   src={`/img/marcas/${brand.slug}.png`} 
                   alt={`${brand.name} logo`}
-                  style={{ height: '48px', width: 'auto', display: 'block' }}
+                  style={{ height: '44px', width: 'auto', display: 'block' }}
+                  className="object-contain"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Pista 2 (Copia idéntica para bucle continuo) */}
+          <div className="flex shrink-0 items-center justify-around gap-16 md:gap-24 py-4 animate-marquee min-w-full" aria-hidden="true">
+            {brands.map((brand, idx) => (
+              <div 
+                key={`p2-${idx}`} 
+                className="flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300"
+                title={brand.name}
+              >
+                <img 
+                  src={`/img/marcas/${brand.slug}.png`} 
+                  alt={`${brand.name} logo`}
+                  style={{ height: '44px', width: 'auto', display: 'block' }}
                   className="object-contain"
                   loading="lazy"
                 />
@@ -79,14 +95,14 @@ export default function BrandsMarquee() {
       <style jsx global>{`
         @keyframes marquee {
           0% {
-            transform: translateX(0);
+            transform: translateX(0%);
           }
           100% {
-            transform: translateX(-33.333%);
+            transform: translateX(-100%);
           }
         }
         .animate-marquee {
-          animation: marquee 75s linear infinite;
+          animation: marquee 55s linear infinite;
         }
         .animate-marquee:hover {
           animation-play-state: paused;
