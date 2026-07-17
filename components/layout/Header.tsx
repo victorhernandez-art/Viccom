@@ -358,7 +358,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                 <div className="absolute left-0 top-full z-50 w-[920px] max-w-[calc(100vw-2rem)] bg-white shadow-xl border border-gray-200 rounded-b-lg overflow-hidden">
                   {categoryTree.length > 0 ? (
                     <div className="grid grid-cols-[240px_1fr_220px] min-h-[360px]">
-                      <div className="bg-gray-50 border-r border-gray-200 py-2">
+                      <div className="bg-gray-50 border-r border-gray-200 py-2 max-h-[480px] overflow-y-auto">
                         {categoryTree.map((category) => (
                           <button
                             key={category.id}
@@ -378,7 +378,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                         ))}
                       </div>
 
-                      <div className="p-5">
+                      <div className="p-5 max-h-[480px] overflow-y-auto">
                         {activeRoot && (
                           <>
                             <Link
@@ -426,7 +426,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                         )}
                       </div>
 
-                      <div className="bg-[#1B2B6B] p-5 text-white">
+                      <div className="bg-[#1B2B6B] p-5 text-white max-h-[480px] overflow-y-auto">
                         <p className="text-xs uppercase tracking-wide text-white/70">VICCOM</p>
                         <p className="mt-2 text-lg font-semibold leading-tight">
                           Equipos de computo, componentes y soluciones para tu negocio
