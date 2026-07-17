@@ -42,8 +42,10 @@ export default async function HomePage() {
       .select('*')
       .eq('en_oferta', true)
       .gt('existencia_total', 0)
-      .order('precio_publico', { ascending: true })
-      .limit(10),
+      .in('categoria_slug', ['laptops', 'impresoras', 'almacenamiento', 'accesorios'])
+      .order('destacado', { ascending: false })
+      .order('precio_publico', { ascending: false })
+      .limit(12),
 
     supabase
       .from('settings')
