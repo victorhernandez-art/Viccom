@@ -4,6 +4,7 @@ import HeroBanner from '@/components/home/HeroBanner'
 import ValueProposition from '@/components/home/ValueProposition'
 import CategoryGrid from '@/components/home/CategoryGrid'
 import FeaturedProducts from '@/components/home/FeaturedProducts'
+import BrandsMarquee from '@/components/home/BrandsMarquee'
 import { type Category, type ProductCatalog } from '@/types'
 
 export const metadata: Metadata = {
@@ -192,6 +193,8 @@ export default async function HomePage() {
           </a>
         </div>
       </section>
+
+      <BrandsMarquee />
     </>
   )
 }
