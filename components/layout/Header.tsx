@@ -25,10 +25,28 @@ type CategoryNode = Category & {
   children: CategoryNode[]
 }
 
+const ROOT_CATEGORIES_ORDER: Record<string, number> = {
+  'cables': 1,
+  'componentes': 2,
+  'computadoras': 3,
+  'conectividad': 4,
+  'electronica': 5,
+  'energia': 6,
+  'gaming': 7,
+  'impresion': 8,
+  'punto de venta': 9,
+  'hogar y linea blanca': 10,
+  'accesorios': 11
+}
+
 function sortCategories<T extends Category>(items: T[]) {
   return [...items].sort((a, b) => {
-    const orderA = a.orden ?? 0
-    const orderB = b.orden ?? 0
+    // Normalizar texto eliminando acentos/tilde y en minúsculas
+    const nameA = a.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
+    const nameB = b.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
+    
+    const orderA = ROOT_CATEGORIES_ORDER[nameA] ?? (a.orden ?? 99)
+    const orderB = ROOT_CATEGORIES_ORDER[nameB] ?? (b.orden ?? 99)
 
     if (orderA !== orderB) return orderA - orderB
     return a.nombre.localeCompare(b.nombre, 'es')
@@ -282,7 +300,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                                     </Link>
                                     {group.children.length > 0 && (
                                       <div className="mt-2 space-y-1.5">
-                                        {group.children.slice(0, 8).map((child) => (
+                                        {group.children.slice(0, 24).map((child) => (
                                           <Link
                                             key={child.id}
                                             href={categoryHref(child)}
