@@ -4,36 +4,36 @@ import React from 'react'
 
 export default function BrandsMarquee() {
   const brands = [
-    { name: 'HP', slug: 'hp', width: 'w-14' },
-    { name: 'Dell', slug: 'dell', width: 'w-14' },
-    { name: 'Lenovo', slug: 'lenovo', width: 'w-18' },
-    { name: 'Asus', slug: 'asus-business', width: 'w-20' },
-    { name: 'Intel', slug: 'intel', width: 'w-16' },
-    { name: 'AMD', slug: 'amd', width: 'w-16' },
-    { name: 'Epson', slug: 'epson', width: 'w-18' },
-    { name: 'Logitech', slug: 'logitech', width: 'w-18' },
-    { name: 'Kingston Technology', slug: 'kingston technology', width: 'w-24' },
-    { name: 'TP-Link', slug: 'tp-link', width: 'w-20' },
-    { name: 'Acer', slug: 'acer', width: 'w-16' },
-    { name: 'ADATA', slug: 'adata', width: 'w-20' },
-    { name: 'Gigabyte', slug: 'gigabyte', width: 'w-20' },
-    { name: 'Xerox', slug: 'xerox', width: 'w-20' },
-    { name: 'Canon', slug: 'canon', width: 'w-16' },
-    { name: 'Brother', slug: 'brother', width: 'w-20' },
-    { name: 'Cisco', slug: 'cisco', width: 'w-16' },
-    { name: 'APC', slug: 'apc', width: 'w-16' },
-    { name: 'Dahua', slug: 'dahua technology', width: 'w-24' },
-    { name: 'Hikvision', slug: 'hikvision', width: 'w-24' },
-    { name: 'LG', slug: 'lg', width: 'w-12' },
-    { name: 'Hisense', slug: 'hisense', width: 'w-20' },
-    { name: 'Microsoft', slug: 'microsoft', width: 'w-20' },
-    { name: 'Vorago', slug: 'vorago', width: 'w-16' },
-    { name: 'Acteck', slug: 'acteck', width: 'w-16' },
-    { name: 'BenQ', slug: 'benq', width: 'w-16' },
-    { name: 'CDP', slug: 'cdp', width: 'w-16' },
-    { name: 'Koblenz', slug: 'koblenz', width: 'w-20' },
-    { name: 'Kyocera', slug: 'kyocera', width: 'w-20' },
-    { name: 'Manhattan', slug: 'manhattan', width: 'w-20' }
+    { name: 'HP', slug: 'hp' },
+    { name: 'Dell', slug: 'dell' },
+    { name: 'Lenovo', slug: 'lenovo' },
+    { name: 'Asus', slug: 'asus-business' },
+    { name: 'Intel', slug: 'intel' },
+    { name: 'AMD', slug: 'amd' },
+    { name: 'Epson', slug: 'epson' },
+    { name: 'Logitech', slug: 'logitech' },
+    { name: 'Kingston Technology', slug: 'kingston technology' },
+    { name: 'TP-Link', slug: 'tp-link' },
+    { name: 'Acer', slug: 'acer' },
+    { name: 'ADATA', slug: 'adata' },
+    { name: 'Gigabyte', slug: 'gigabyte' },
+    { name: 'Xerox', slug: 'xerox' },
+    { name: 'Canon', slug: 'canon' },
+    { name: 'Brother', slug: 'brother' },
+    { name: 'Cisco', slug: 'cisco' },
+    { name: 'APC', slug: 'apc' },
+    { name: 'Dahua', slug: 'dahua technology' },
+    { name: 'Hikvision', slug: 'hikvision' },
+    { name: 'LG', slug: 'lg' },
+    { name: 'Hisense', slug: 'hisense' },
+    { name: 'Microsoft', slug: 'microsoft' },
+    { name: 'Vorago', slug: 'vorago' },
+    { name: 'Acteck', slug: 'acteck' },
+    { name: 'BenQ', slug: 'benq' },
+    { name: 'CDP', slug: 'cdp' },
+    { name: 'Koblenz', slug: 'koblenz' },
+    { name: 'Kyocera', slug: 'kyocera' },
+    { name: 'Manhattan', slug: 'manhattan' }
   ]
 
   // Duplicar la lista para lograr un scroll infinito fluido
@@ -61,10 +61,12 @@ export default function BrandsMarquee() {
                 className="group flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300"
                 title={brand.name}
               >
+                {/* Usamos un alto fijo en px inline para garantizar visualización sin depender de clases de Tailwind inexistentes */}
                 <img 
                   src={`/img/marcas/${brand.slug}.png`} 
                   alt={`${brand.name} logo`}
-                  className={`h-14 ${brand.width} object-contain`}
+                  style={{ height: '48px', width: 'auto', display: 'block' }}
+                  className="object-contain"
                   loading="lazy"
                 />
               </div>
