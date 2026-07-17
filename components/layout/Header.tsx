@@ -25,30 +25,96 @@ type CategoryNode = Category & {
   children: CategoryNode[]
 }
 
-const ROOT_CATEGORIES_ORDER: Record<string, number> = {
-  'cables': 1,
-  'componentes': 2,
-  'computadoras': 3,
-  'conectividad': 4,
-  'electronica': 5,
-  'energia': 6,
-  'gaming': 7,
-  'impresion': 8,
-  'punto de venta': 9,
-  'hogar y linea blanca': 10,
-  'accesorios': 11
+const CT_GROUPS = [
+  { id: 'cables', nombre: 'CABLES', slug: 'cables' },
+  { id: 'componentes', nombre: 'COMPONENTES', slug: 'componentes' },
+  { id: 'computadoras', nombre: 'COMPUTADORAS', slug: 'computadoras' },
+  { id: 'conectividad', nombre: 'CONECTIVIDAD', slug: 'conectividad' },
+  { id: 'electronica', nombre: 'ELECTRÓNICA', slug: 'electronica' },
+  { id: 'energia', nombre: 'ENERGÍA', slug: 'energia' },
+  { id: 'gaming', nombre: 'GAMING', slug: 'gaming' },
+  { id: 'impresion', nombre: 'IMPRESIÓN', slug: 'impresion' },
+  { id: 'punto-de-venta', nombre: 'PUNTO DE VENTA', slug: 'punto-de-venta' },
+  { id: 'hogar-y-linea-blanca', nombre: 'HOGAR Y LÍNEA BLANCA', slug: 'hogar-y-linea-blanca' },
+  { id: 'accesorios', nombre: 'ACCESORIOS', slug: 'accesorios' }
+]
+
+const GROUP_MAPPING: Record<string, string> = {
+  // Cables
+  'cables': 'CABLES',
+  'adaptadores': 'CABLES',
+  'modulos-supresores': 'CABLES',
+  
+  // Componentes
+  'ensamble': 'COMPONENTES',
+  'tarjetas': 'COMPONENTES',
+  'almacenamiento': 'COMPONENTES',
+  'almacenamiento-portatil': 'COMPONENTES',
+  
+  // Computadoras
+  'computadoras': 'COMPUTADORAS',
+  'computadoras-gaming': 'COMPUTADORAS',
+  'workstations': 'COMPUTADORAS',
+  'apple': 'COMPUTADORAS',
+  'all-in-one': 'COMPUTADORAS',
+  'mini-pc': 'COMPUTADORAS',
+  
+  // Conectividad
+  'red-activa': 'CONECTIVIDAD',
+  'red-pasiva': 'CONECTIVIDAD',
+  'conferencias': 'CONECTIVIDAD',
+  'conmutadores-pbx': 'CONECTIVIDAD',
+  'telefonos': 'CONECTIVIDAD',
+  'centro-de-datos': 'CONECTIVIDAD',
+  
+  // Electrónica
+  'electronica': 'ELECTRÓNICA',
+  'senalizacion-digital': 'ELECTRÓNICA',
+  'audio': 'ELECTRÓNICA',
+  'proyectores': 'ELECTRÓNICA',
+  'televisiones': 'ELECTRÓNICA',
+  
+  // Energía
+  'energia': 'ENERGÍA',
+  'respaldo-y-regulacion': 'ENERGÍA',
+  'energia-solar-y-eolica': 'ENERGÍA',
+  
+  // Gaming
+  'gaming': 'GAMING',
+  'accesorios-gaming': 'GAMING',
+  
+  // Impresión
+  'impresion': 'IMPRESIÓN',
+  'consumibles': 'IMPRESIÓN',
+  'digitalizacion-de-imagenes': 'IMPRESIÓN',
+  
+  // Punto de Venta
+  'perifericos-para-pos': 'PUNTO DE VENTA',
+  'accesorios-y-consumibles-pos': 'PUNTO DE VENTA',
+  'credencializacion': 'PUNTO DE VENTA',
+  'sistemas-de-control': 'PUNTO DE VENTA',
+  
+  // Hogar y Línea Blanca
+  'linea-blanca': 'HOGAR Y LÍNEA BLANCA',
+  'domotica': 'HOGAR Y LÍNEA BLANCA',
+  'oficina': 'HOGAR Y LÍNEA BLANCA',
+  'papeleria': 'HOGAR Y LÍNEA BLANCA',
+  'salud': 'HOGAR Y LÍNEA BLANCA',
+  
+  // Accesorios
+  'accesorios-para-componentes': 'ACCESORIOS',
+  'accesorios-para-computo': 'ACCESORIOS',
+  'accesorios-para-electronica': 'ACCESORIOS',
+  'accesorios-para-energia': 'ACCESORIOS',
+  'accesorios-para-impresion': 'ACCESORIOS',
+  'accesorios-para-servidores': 'ACCESORIOS',
+  'esd': 'ACCESORIOS',
+  'software': 'ACCESORIOS',
+  'software_': 'ACCESORIOS'
 }
 
 function sortCategories<T extends Category>(items: T[]) {
   return [...items].sort((a, b) => {
-    // Normalizar texto eliminando acentos/tilde y en minúsculas
-    const nameA = a.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
-    const nameB = b.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
-    
-    const orderA = ROOT_CATEGORIES_ORDER[nameA] ?? (a.orden ?? 99)
-    const orderB = ROOT_CATEGORIES_ORDER[nameB] ?? (b.orden ?? 99)
-
-    if (orderA !== orderB) return orderA - orderB
     return a.nombre.localeCompare(b.nombre, 'es')
   })
 }
@@ -104,9 +170,45 @@ export default function Header({ categories = [] }: HeaderProps) {
   const [activeRootId, setActiveRootId] = useState<string | null>(null)
   const router = useRouter()
   const catRef = useRef<HTMLLIElement>(null)
-  const categoryTree = useMemo(() => buildCategoryTree(categories), [categories])
+  const categoryTree = useMemo(() => {
+    // 1. Construir el árbol de categorías base
+    const rawTree = buildCategoryTree(categories)
+
+    // 2. Agrupar categorías raíz reales en los 11 grupos de CT
+    const groupsMap = new Map<string, CategoryNode[]>()
+    CT_GROUPS.forEach(g => groupsMap.set(g.nombre, []))
+
+    rawTree.forEach(node => {
+      const slugKey = node.slug.toLowerCase().trim()
+      const groupName = GROUP_MAPPING[slugKey] ?? 'ACCESORIOS'
+      if (groupsMap.has(groupName)) {
+        groupsMap.get(groupName)!.push(node)
+      }
+    })
+
+    // 3. Retornar los 11 grupos como raíces virtuales
+    return CT_GROUPS.map(g => {
+      const children = groupsMap.get(g.nombre) ?? []
+      const sortedChildren = children.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+
+      return {
+        id: g.id,
+        nombre: g.nombre,
+        slug: g.slug,
+        parent_id: null,
+        nivel: 1,
+        activo: true,
+        created_at: '',
+        updated_at: '',
+        orden: 0,
+        path: g.slug,
+        children: sortedChildren // Las raíces reales de la DB se vuelven el nivel 2 aquí
+      } as CategoryNode
+    })
+  }, [categories])
+
   const activeRoot = categoryTree.find((category) => category.id === activeRootId) ?? categoryTree[0]
-  const mobileCategories = useMemo(() => flattenCategoryTree(categoryTree).slice(0, 18), [categoryTree])
+  const mobileCategories = useMemo(() => flattenCategoryTree(categoryTree).slice(0, 24), [categoryTree])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10)
