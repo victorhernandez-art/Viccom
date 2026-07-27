@@ -49,6 +49,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   if (!product) notFound()
 
+  // 1. Mapeo inteligente de categorías complementarias (Cross-selling)
+  const crossSellingMap: Record<string, string[]> = {
+    'computadoras': ['accesorios-para-computo', 'almacenamiento-portatil', 'cables', 'audio', 'computadoras'],
+    'computadoras-gaming': ['accesorios-gaming', 'accesorios-para-computo', 'cables', 'audio', 'computadoras-gaming'],
+    'workstations': ['accesorios-para-computo', 'accesorios-para-servidores', 'cables', 'respaldo-y-regulacion'],
+    'impresion': ['consumibles', 'accesorios-para-impresion', 'papeleria', 'impresion'],
+    'digitalizacion-de-imagenes': ['consumibles', 'papeleria'],
+    'electronica': ['energia', 'cables', 'audio', 'baterias-banks'],
+    'accesorios-para-electronica': ['energia', 'cables', 'audio', 'baterias-banks'],
+    'video-vigilancia': ['cables', 'red-pasiva', 'energia', 'almacenamiento', 'video-vigilancia'],
+    'seguridad': ['cables', 'red-pasiva', 'energia', 'almacenamiento', 'seguridad'],
+    'solucion-para-servidores': ['accesorios-para-servidores', 'almacenamiento', 'cables', 'respaldo-y-regulacion']
+  }
+
+  const currentCatSlug = product.categoria_slug || ''
+  const targetCategorySlugs = crossSellingMap[currentCatSlug] || [currentCatSlug]
+
   // Inventario + recomendados + settings en paralelo
   const [inventoryRes, relatedRes, settingsRes] = await Promise.all([
     supabase
@@ -63,9 +80,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
       .select('*')
       .neq('id', product.id)
       .gt('existencia_total', 0)
-      .order('destacado', { ascending: false })
-      .order('existencia_total', { ascending: false })
-      .limit(24),
+      .in('categoria_slug', targetCategorySlugs)
+      .limit(60), // Traer un pool más grande para poder variar diariamente
 
     supabase
       .from('settings')
@@ -75,11 +91,32 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const inventory = inventoryRes.data ?? []
   const relatedPool = (relatedRes.data ?? []) as ProductCatalog[]
-  const related = relatedPool
+
+  // 2. Lógica de Rotación Diaria (Aleatorización Controlada) usando el día del año como semilla
+  const today = new Date()
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000)
+  
+  // Función para ordenar pseudo-aleatoriamente en base a una semilla numérica
+  const shuffleWithSeed = (array: any[], seed: number) => {
+    let m = array.length, t, i
+    while (m) {
+      i = Math.floor(Math.abs(Math.sin(seed++)) * m--)
+      t = array[m]
+      array[m] = array[i]
+      array[i] = t
+    }
+    return array
+  }
+
+  // Mezclar el pool de productos de manera fija por cada día
+  const shuffledPool = shuffleWithSeed([...relatedPool], dayOfYear)
+
+  // Priorizar productos de categorías diferentes a la actual (accesorios/complementos) sobre la misma categoría, y limitar a 16
+  const related = shuffledPool
     .sort((a, b) => {
-      const aSameCategory = a.categoria_id === product.categoria_id ? 1 : 0
-      const bSameCategory = b.categoria_id === product.categoria_id ? 1 : 0
-      if (aSameCategory !== bSameCategory) return bSameCategory - aSameCategory
+      const aIsComplement = a.categoria_id !== product.categoria_id ? 1 : 0
+      const bIsComplement = b.categoria_id !== product.categoria_id ? 1 : 0
+      if (aIsComplement !== bIsComplement) return bIsComplement - aIsComplement
       return (b.existencia_total ?? 0) - (a.existencia_total ?? 0)
     })
     .slice(0, 16)
