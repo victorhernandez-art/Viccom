@@ -3,12 +3,36 @@ import { logger }         from '../../utils/logger'
 import { type CTProduct } from './processCatalog'
 
 export async function syncInventory(ctProducts: CTProduct[]): Promise<void> {
-  // Obtener mapa sku_ct → product_id
-  const { data: products } = await supabaseAdmin
-    .from('products')
-    .select('id,sku_ct')
+  // Obtener mapa sku_ct → product_id (PAGINADO para evitar límite de 1000)
+  const allProducts: { id: string; sku_ct: string }[] = []
+  let page = 0
+  const PAGE_SIZE = 1000
+  let hasMore = true
 
-  const skuToId = new Map<string, string>((products ?? []).map(p => [p.sku_ct, p.id]))
+  while (hasMore) {
+    const { data: products, error } = await supabaseAdmin
+      .from('products')
+      .select('id,sku_ct')
+      .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+
+    if (error) {
+      logger.error('Error fetching products list for inventory sync', { error: error.message })
+      break
+    }
+
+    if (products && products.length > 0) {
+      allProducts.push(...products)
+      page++
+      if (products.length < PAGE_SIZE) {
+        hasMore = false
+      }
+    } else {
+      hasMore = false
+    }
+  }
+
+  logger.info(`Loaded ${allProducts.length} products from DB to build SKU map`)
+  const skuToId = new Map<string, string>(allProducts.map(p => [p.sku_ct, p.id]))
 
   const rows: {
     product_id:  string
