@@ -92,15 +92,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .filter((inv: any) => inv.almacen === 'TXA')
     .reduce((sum: number, inv: any) => sum + Number(inv.existencia ?? 0), 0)
 
-  // Almacenes de envío nacional autorizados por CT (incluyendo TXL que tarda de 3 a 4 días)
-  const almacenesNacionales = [
-    'TXL', 'DFA', 'GDL', 'MTY', 'HMO', 'MID', 'VER', 'PUE', 'LEO', 'QRO', 'SLP', 
-    'TOL', 'TRN', 'CUN', 'VHA', 'D2A', 'DFP', 'MOR', 'CHI', 'ZAC', 'AGS',
-    'CEL', 'CHI', 'CLN', 'DGO', 'MID', 'OAX', 'PAC', 'SLT', 'VER', 'XLP'
-  ]
-
+  // Almacenes de envío nacional: todos los almacenes registrados en Supabase excepto TXA
   const otherStock = inventory
-    .filter((inv: any) => almacenesNacionales.includes(inv.almacen))
+    .filter((inv: any) => inv.almacen !== 'TXA')
     .reduce((sum: number, inv: any) => sum + Number(inv.existencia ?? 0), 0)
 
   const totalLiveStock = tuxtlaStock + otherStock
