@@ -168,6 +168,7 @@ export default function Header({ categories = [] }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false)
   const [catOpen, setCatOpen] = useState(false)
   const [activeRootId, setActiveRootId] = useState<string | null>(null)
+  const [expandedMobileCatId, setExpandedMobileCatId] = useState<string | null>(null)
   const router = useRouter()
   const catRef = useRef<HTMLLIElement>(null)
   const categoryTree = useMemo(() => {
