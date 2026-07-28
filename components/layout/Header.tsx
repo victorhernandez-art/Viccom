@@ -259,8 +259,8 @@ export default function Header({ categories = [] }: HeaderProps) {
       )}
     >
       <div className="bg-[#1B2B6B] text-white py-1 px-4 text-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-4 flex-wrap">
+        <div className="max-w-7xl mx-auto flex items-center justify-end flex-wrap gap-2">
+          <div className="flex items-center gap-4 flex-wrap w-full justify-between sm:justify-end">
             <span className="flex items-center gap-1">
               <Phone className="w-3.5 h-3.5" />
               <a href={`tel:${phoneHref}`} className="hover:underline">
@@ -274,9 +274,6 @@ export default function Header({ categories = [] }: HeaderProps) {
               </a>
             </span>
           </div>
-          <span className="font-semibold text-[10px] md:text-xs">
-            DISTRIBUIDOR DE EQUIPOS DE CÓMPUTO EN CHIAPAS
-          </span>
         </div>
       </div>
 
