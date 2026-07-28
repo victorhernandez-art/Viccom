@@ -243,58 +243,49 @@ export default function Header({ categories = [] }: HeaderProps) {
     }
   }
 
+  function handleMobileCategoryClick(catId: string) {
+    setExpandedMobileCatId(expandedMobileCatId === catId ? null : catId)
+  }
+
   const phoneDisplay = process.env.NEXT_PUBLIC_EMPRESA_TELEFONO ?? '961 120 93 61'
   const phoneHref = phoneDisplay.replace(/\D/g, '')
   const email = process.env.NEXT_PUBLIC_EMPRESA_CORREO ?? 'vic_computo@hotmail.com'
-  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''
 
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full transition-shadow duration-300',
-        scrolled ? 'shadow-lg' : 'shadow-sm'
+        'sticky top-0 z-40 w-full transition-shadow duration-200 border-b border-gray-200 bg-white',
+        scrolled ? 'shadow-md' : 'shadow-sm'
       )}
     >
-      <div className="bg-gray-100 border-b border-gray-200 text-xs">
-        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a
-              href={`tel:${phoneHref}`}
-              className="flex items-center gap-1 text-gray-600 hover:text-[#CC0000] transition-colors"
-            >
-              <Phone className="w-3 h-3" />
-              <span>{phoneDisplay}</span>
-            </a>
-            <a
-              href={`mailto:${email}`}
-              className="hidden sm:flex items-center gap-1 text-gray-600 hover:text-[#CC0000] transition-colors"
-            >
-              <Mail className="w-3 h-3" />
-              <span>{email}</span>
-            </a>
-          </div>
-          <div className="flex items-center gap-3">
-            {whatsapp && (
-              <a
-                href={`https://wa.me/${whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 bg-green-600 hover:bg-green-500 px-2 py-0.5 rounded text-white transition-colors"
-              >
-                <MessageCircle className="w-3 h-3" />
-                <span>WhatsApp</span>
+      <div className="bg-[#1B2B6B] text-white py-1 px-4 text-xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-4 flex-wrap">
+            <span className="flex items-center gap-1">
+              <Phone className="w-3.5 h-3.5" />
+              <a href={`tel:${phoneHref}`} className="hover:underline">
+                {phoneDisplay}
               </a>
-            )}
+            </span>
+            <span className="flex items-center gap-1">
+              <Mail className="w-3.5 h-3.5" />
+              <a href={`mailto:${email}`} className="hover:underline">
+                {email}
+              </a>
+            </span>
           </div>
+          <span className="font-semibold text-[10px] md:text-xs">
+            DISTRIBUIDOR DE EQUIPOS DE CÓMPUTO EN CHIAPAS
+          </span>
         </div>
       </div>
 
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Link href="/" className="flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
+        <div className="flex items-center justify-between gap-4">
+          <Link href="/" className="flex-shrink-0" onClick={() => setMenuOpen(false)}>
             <Image
               src="/img/logo.png"
-              alt="VICCOM - Distribuidor de equipos de computo"
+              alt="Viccom"
               width={200}
               height={60}
               priority
@@ -429,7 +420,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                       <div className="bg-[#1B2B6B] p-5 text-white max-h-[480px] overflow-y-auto">
                         <p className="text-xs uppercase tracking-wide text-white/70">VICCOM</p>
                         <p className="mt-2 text-lg font-semibold leading-tight">
-                          Equipos de computo, componentes y soluciones para tu negocio
+                          Equipos de cómputo, componentes y soluciones para tu negocio
                         </p>
                         <div className="mt-5 space-y-2">
                           <Link
@@ -450,7 +441,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                       </div>
                     </div>
                   ) : (
-                    <p className="px-4 py-3 text-gray-400 text-sm">Sin categorias</p>
+                    <p className="px-4 py-3 text-gray-400 text-sm">Sin categorías</p>
                   )}
                 </div>
               )}
@@ -484,271 +475,22 @@ export default function Header({ categories = [] }: HeaderProps) {
         </div>
       </nav>
 
-  const [expandedMobileCatId, setExpandedMobileCatId] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [menuOpen])
-
-  function handleMobileCategoryClick(catId: string) {
-    setExpandedMobileCatId(expandedMobileCatId === catId ? null : catId)
-  }
-
-  return (
-    <header
-      className={cn(
-        'w-full bg-white z-40 transition-shadow duration-200 border-b border-gray-200',
-        scrolled ? 'fixed top-0 left-0 right-0 shadow-md' : 'relative'
-      )}
-    >
-      <div className="bg-[#1B2B6B] text-white py-1 px-4 text-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="flex items-center gap-1">
-              <Phone className="w-3.5 h-3.5" />
-              <a href={`tel:${phoneHref}`} className="hover:underline">
-                {phoneDisplay}
-              </a>
-            </span>
-            <span className="flex items-center gap-1">
-              <Mail className="w-3.5 h-3.5" />
-              <a href={`mailto:${email}`} className="hover:underline">
-                {email}
-              </a>
-            </span>
-          </div>
-          <span className="font-semibold text-[10px] md:text-xs">
-            DISTRIBUIDOR DE EQUIPOS DE CÓMPUTO EN CHIAPAS
-          </span>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
-        <div className="flex items-center justify-between gap-4">
-          <Link href="/" className="flex-shrink-0" onClick={() => setMenuOpen(false)}>
-            <Image
-              src="/images/logo_nav.png"
-              alt="Viccom"
-              width={160}
-              height={48}
-              priority
-              className="h-12 w-auto object-contain"
-            />
-          </Link>
-
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl items-center">
-            <div className="flex w-full rounded-lg border border-gray-300 overflow-hidden focus-within:border-[#1B2B6B] transition-colors">
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar productos, marcas, SKU..."
-                className="flex-1 px-4 py-2 text-sm outline-none bg-white text-gray-800 placeholder:text-gray-400"
-                aria-label="Buscar productos"
-              />
-              <button
-                type="submit"
-                className="bg-[#CC0000] hover:bg-[#A30000] px-4 text-white transition-colors"
-                aria-label="Buscar"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-            </div>
-          </form>
-
-          <button
-            className="md:hidden ml-auto p-2 text-[#1B2B6B]"
-            onClick={() => setMenuOpen((value) => !value)}
-            aria-label="Menu"
-          >
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
-
-      <nav className="hidden md:block bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4">
-          <ul className="flex items-center gap-0 text-sm font-medium">
-            <li>
-              <Link
-                href="/"
-                className="flex items-center px-4 py-3 text-[#1B2B6B] font-semibold hover:bg-gray-100 hover:text-[#CC0000] transition-colors"
-              >
-                Inicio
-              </Link>
-            </li>
-
-            <li ref={catRef} className="relative">
-              <button
-                onClick={() => setCatOpen((value) => !value)}
-                className="flex items-center gap-1 px-4 py-3 text-[#1B2B6B] hover:bg-gray-100 hover:text-[#CC0000] transition-colors"
-              >
-                <Menu className="w-4 h-4" />
-                <span>Categorías</span>
-                <ChevronDown className={cn('w-4 h-4 transition-transform', catOpen && 'rotate-180')} />
-              </button>
-
-              {catOpen && (
-                <div className="absolute left-0 top-full z-50 w-[920px] max-w-[calc(100vw-2rem)] bg-white shadow-xl border border-gray-200 rounded-b-lg overflow-hidden">
-                  {categoryTree.length > 0 ? (
-                    <div className="grid grid-cols-[240px_1fr_220px] min-h-[360px]">
-                      <div className="bg-gray-50 border-r border-gray-200 py-2 max-h-[480px] overflow-y-auto">
-                        {categoryTree.map((category) => (
-                          <button
-                            key={category.id}
-                            type="button"
-                            onMouseEnter={() => setActiveRootId(category.id)}
-                            onFocus={() => setActiveRootId(category.id)}
-                            className={cn(
-                              'w-full flex items-center justify-between gap-2 px-4 py-2.5 text-left text-sm transition-colors',
-                              activeRoot?.id === category.id
-                                ? 'bg-white text-[#CC0000] font-semibold'
-                                : 'text-gray-700 hover:bg-white hover:text-[#1B2B6B]'
-                            )}
-                          >
-                            <span className="truncate">{category.nombre}</span>
-                            <ChevronRight className="w-4 h-4 flex-shrink-0" />
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="p-5 max-h-[480px] overflow-y-auto">
-                        {activeRoot && (
-                          <>
-                            <Link
-                              href={categoryHref(activeRoot)}
-                              onClick={() => setCatOpen(false)}
-                              className="inline-flex text-base font-semibold text-[#1B2B6B] hover:text-[#CC0000]"
-                            >
-                              {activeRoot.nombre}
-                            </Link>
-
-                            {activeRoot.children.length > 0 ? (
-                              <div className="mt-4 grid grid-cols-2 gap-x-8 gap-y-5">
-                                {activeRoot.children.map((group) => (
-                                  <div key={group.id}>
-                                    <Link
-                                      href={categoryHref(group)}
-                                      onClick={() => setCatOpen(false)}
-                                      className="block text-sm font-semibold text-gray-900 hover:text-[#CC0000]"
-                                    >
-                                      {group.nombre}
-                                    </Link>
-                                    {group.children.length > 0 && (
-                                      <div className="mt-2 space-y-1.5">
-                                        {group.children.slice(0, 24).map((child) => (
-                                          <Link
-                                            key={child.id}
-                                            href={categoryHref(child)}
-                                            onClick={() => setCatOpen(false)}
-                                            className="block text-sm text-gray-600 hover:text-[#CC0000]"
-                                          >
-                                            {child.nombre}
-                                          </Link>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="mt-4 text-sm text-gray-500">
-                                Esta categoría está lista para recibir nuevos productos.
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </div>
-
-                      <div className="bg-[#1B2B6B] p-5 text-white max-h-[480px] overflow-y-auto">
-                        <p className="text-xs uppercase tracking-wide text-white/70">VICCOM</p>
-                        <p className="mt-2 text-lg font-semibold leading-tight">
-                          Equipos de computo, componentes y soluciones para tu negocio
-                        </p>
-                        <div className="mt-5 space-y-2">
-                          <Link
-                              href="/catalogo"
-                              onClick={() => setCatOpen(false)}
-                              className="block rounded border border-white/30 px-3 py-2 text-sm hover:bg-white hover:text-[#1B2B6B] transition-colors"
-                          >
-                            Ver catálogo completo
-                          </Link>
-                          <Link
-                              href="/catalogo?en_oferta=true"
-                              onClick={() => setCatOpen(false)}
-                              className="block rounded border border-white/30 px-3 py-2 text-sm hover:bg-white hover:text-[#1B2B6B] transition-colors"
-                          >
-                            Ver ofertas
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="px-4 py-3 text-gray-400 text-sm">Sin categorias</p>
-                  )}
-                </div>
-              )}
-            </li>
-
-            <li>
-              <Link
-                href="/catalogo"
-                className="flex items-center px-4 py-3 text-[#1B2B6B] font-semibold hover:bg-gray-100 hover:text-[#CC0000] transition-colors"
-              >
-                Catálogo
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/catalogo?destacado=true"
-                className="flex items-center px-4 py-3 text-[#1B2B6B] font-semibold hover:bg-gray-100 hover:text-[#CC0000] transition-colors"
-              >
-                Destacados
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/catalogo?en_oferta=true"
-                className="flex items-center px-4 py-3 text-[#CC0000] font-semibold hover:bg-gray-100 hover:text-[#A30000] transition-colors"
-              >
-                Ofertas
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
-      {/* Menú Móvil Mejorado (Overlay Fullscreen + Acordeón) */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          {/* Fondo semitransparente oscuro con clic para cerrar */}
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
             onClick={() => setMenuOpen(false)}
           />
-
-          {/* Panel Lateral deslizante */}
           <div className="relative w-full max-w-[320px] bg-white h-full shadow-2xl flex flex-col z-10 transition-transform duration-300">
-            {/* Encabezado del menú móvil */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <span className="font-bold text-gray-800 text-base">Menú Principal</span>
               <button
                 onClick={() => setMenuOpen(false)}
                 className="p-2 -mr-2 text-gray-500 hover:text-gray-800"
-                aria-label="Cerrar menú"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
-
-            {/* Barra de Búsqueda Móvil */}
             <div className="p-4 border-b border-gray-50 bg-gray-50">
               <form onSubmit={handleSearch} className="flex items-center">
                 <div className="flex w-full rounded-lg border border-gray-300 overflow-hidden focus-within:border-[#1B2B6B] bg-white transition-colors">
@@ -758,53 +500,21 @@ export default function Header({ categories = [] }: HeaderProps) {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar productos..."
                     className="flex-1 px-3 py-2 text-sm outline-none bg-white text-gray-800 placeholder:text-gray-400"
-                    aria-label="Buscar"
                   />
-                  <button type="submit" className="bg-[#CC0000] px-3 text-white" aria-label="Buscar">
+                  <button type="submit" className="bg-[#CC0000] px-3 text-white">
                     <Search className="w-4 h-4" />
                   </button>
                 </div>
               </form>
             </div>
-
-            {/* Lista de enlaces principal y acordeón con scroll */}
             <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
-              <Link
-                href="/"
-                onClick={() => setMenuOpen(false)}
-                className="block py-3 border-b border-gray-100 text-gray-700 font-semibold hover:text-[#CC0000] transition-colors"
-              >
-                Inicio
-              </Link>
-              <Link
-                href="/catalogo"
-                onClick={() => setMenuOpen(false)}
-                className="block py-3 border-b border-gray-100 text-gray-700 font-semibold hover:text-[#CC0000] transition-colors"
-              >
-                Catálogo completo
-              </Link>
-              <Link
-                href="/catalogo?destacado=true"
-                onClick={() => setMenuOpen(false)}
-                className="block py-3 border-b border-gray-100 text-[#1B2B6B] font-semibold hover:text-[#CC0000] transition-colors"
-              >
-                Productos Destacados
-              </Link>
-              <Link
-                href="/catalogo?en_oferta=true"
-                onClick={() => setMenuOpen(false)}
-                className="block py-3 border-b border-gray-100 text-[#CC0000] font-semibold hover:text-[#A30000] transition-colors"
-              >
-                Ofertas Especiales
-              </Link>
-
-              {/* Acordeón de Categorías */}
+              <Link href="/" onClick={() => setMenuOpen(false)} className="block py-3 border-b border-gray-100 text-gray-700 font-semibold hover:text-[#CC0000]">Inicio</Link>
+              <Link href="/catalogo" onClick={() => setMenuOpen(false)} className="block py-3 border-b border-gray-100 text-gray-700 font-semibold hover:text-[#CC0000]">Catálogo completo</Link>
               <div className="pt-2">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Categorías</p>
                 {categoryTree.map((category) => {
                   const isExpanded = expandedMobileCatId === category.id
                   const hasChildren = category.children && category.children.length > 0
-
                   return (
                     <div key={category.id} className="border-b border-gray-50">
                       {hasChildren ? (
@@ -814,52 +524,25 @@ export default function Header({ categories = [] }: HeaderProps) {
                             className="w-full flex items-center justify-between py-3 text-left text-sm font-medium text-gray-700 hover:text-[#CC0000]"
                           >
                             <span>{category.nombre}</span>
-                            <ChevronDown
-                              className={cn(
-                                'w-4 h-4 text-gray-400 transition-transform duration-200',
-                                isExpanded && 'rotate-180 text-[#CC0000]'
-                              )}
-                            />
+                            <ChevronDown className={cn('w-4 h-4 text-gray-400 transition-transform duration-200', isExpanded && 'rotate-180 text-[#CC0000]')} />
                           </button>
-
                           {isExpanded && (
                             <div className="pl-3 pb-2 space-y-1.5 bg-gray-50/50 rounded-lg p-2 mb-2">
-                              <Link
-                                href={categoryHref(category)}
-                                onClick={() => setMenuOpen(false)}
-                                className="block py-1.5 text-xs text-[#1B2B6B] font-semibold hover:text-[#CC0000]"
-                              >
-                                Ver todo en {category.nombre}
-                              </Link>
+                              <Link href={categoryHref(category)} onClick={() => setMenuOpen(false)} className="block py-1.5 text-xs text-[#1B2B6B] font-semibold hover:text-[#CC0000]">Ver todo</Link>
                               {category.children.map((subcat) => (
-                                <Link
-                                  key={subcat.id}
-                                  href={categoryHref(subcat)}
-                                  onClick={() => setMenuOpen(false)}
-                                  className="block py-1 text-xs text-gray-600 hover:text-[#CC0000] border-l border-gray-200 pl-2"
-                                >
-                                  {subcat.nombre}
-                                </Link>
+                                <Link key={subcat.id} href={categoryHref(subcat)} onClick={() => setMenuOpen(false)} className="block py-1 text-xs text-gray-600 hover:text-[#CC0000] border-l border-gray-200 pl-2">{subcat.nombre}</Link>
                               ))}
                             </div>
                           )}
                         </>
                       ) : (
-                        <Link
-                          href={categoryHref(category)}
-                          onClick={() => setMenuOpen(false)}
-                          className="block py-3 text-sm font-medium text-gray-700 hover:text-[#CC0000]"
-                        >
-                          {category.nombre}
-                        </Link>
+                        <Link href={categoryHref(category)} onClick={() => setMenuOpen(false)} className="block py-3 text-sm font-medium text-gray-700 hover:text-[#CC0000]">{category.nombre}</Link>
                       )}
                     </div>
                   )
                 })}
               </div>
             </div>
-            
-            {/* Pie de menú con datos de contacto */}
             <div className="p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 space-y-1">
               <p className="font-semibold text-gray-700">VICCOM Computadoras</p>
               <p>Tel: {phoneDisplay}</p>
