@@ -59,7 +59,7 @@ export default function IcecatSpecs({ upc, fichaTecnicaCt }: IcecatSpecsProps) {
     const cleanUpc = upc.replace(/\D/g, '')
     if (cleanUpc.length < 8) return
 
-    const username = process.env.NEXT_PUBLIC_ICECAT_USERNAME ?? 'viccom26'
+    const username = process.env.NEXT_PUBLIC_ICECAT_USERNAME || 'viccom26'
 
     async function fetchSpecs() {
       setLoading(true)

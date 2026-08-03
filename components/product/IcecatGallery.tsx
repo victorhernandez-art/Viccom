@@ -32,7 +32,7 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
     const cleanUpc = upc.replace(/\D/g, '')
     if (cleanUpc.length < 8) return
 
-    const username = process.env.NEXT_PUBLIC_ICECAT_USERNAME ?? 'viccom26'
+    const username = process.env.NEXT_PUBLIC_ICECAT_USERNAME || 'viccom26'
 
     async function fetchIcecatData() {
       setLoading(true)
