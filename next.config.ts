@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
         pathname: '/storage/**',
       },
       {
+        protocol: 'https',
+        hostname: '*.icecat.biz',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: '*.icecat.biz',
+        pathname: '/**',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
       },
@@ -25,9 +35,6 @@ const nextConfig: NextConfig = {
   experimental: {},
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   async headers() {
     return [
