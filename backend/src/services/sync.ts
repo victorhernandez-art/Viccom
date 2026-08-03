@@ -6,7 +6,17 @@ import { calculatePrices }  from './ctconnect/calculatePrices'
 import { saveLogs }         from './ctconnect/saveLogs'
 import { logger }           from '../utils/logger'
 
+// ── Lock para evitar sincronizaciones concurrentes ───────────────────────────
+// Si el cron se dispara mientras ya hay un sync corriendo (manual o anterior),
+// la nueva llamada es ignorada en lugar de ejecutarse en paralelo.
+let isSyncing = false
+
 export async function runFullSync(): Promise<void> {
+  if (isSyncing) {
+    logger.warn('Sync already in progress — skipping this trigger to avoid concurrent execution.')
+    return
+  }
+  isSyncing = true
   const startTime = Date.now()
   const proceso   = 'full_sync'
 
@@ -70,6 +80,7 @@ export async function runFullSync(): Promise<void> {
     logData.mensaje      = 'Error durante la sincronización.'
     logger.error(`[${proceso}] Sync failed`, { error: logData.error_detalle })
   } finally {
+    isSyncing = false  // ← Liberar el lock siempre, con éxito o con error
     logData.duracion_segundos = Math.round((Date.now() - startTime) / 1000)
     await saveLogs(logData)
     logger.info(`[${proceso}] Completed in ${logData.duracion_segundos}s — state: ${logData.estado}`)

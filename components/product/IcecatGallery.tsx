@@ -5,11 +5,11 @@ import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Maximize2, Loader2 } from 'lucide-react'
 
 interface IcecatImage {
-  Pic: string
+  Pic?: string
+  HighPic?: string
+  LowPic?: string
   Thumb?: string
   IsMain?: string
-  Width?: number
-  Height?: number
 }
 
 interface IcecatGalleryProps {
@@ -28,33 +28,46 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
     // Si no hay UPC/GTIN, nos quedamos con el fallback principal
     if (!upc) return
 
-    // Limpiar caracteres no numéricos del UPC (algunos códigos traen espacios o guiones)
+    // Limpiar caracteres no numéricos del UPC
     const cleanUpc = upc.replace(/\D/g, '')
     if (cleanUpc.length < 8) return
 
-    const username = process.env.NEXT_PUBLIC_ICECAT_USERNAME ?? 'openicecat-free'
-    
+    const username = process.env.NEXT_PUBLIC_ICECAT_USERNAME ?? 'viccom26'
+
     async function fetchIcecatData() {
       setLoading(true)
       try {
         const res = await fetch(`https://live.icecat.biz/api/?UserName=${username}&Language=es&GTIN=${cleanUpc}`)
-        if (!res.ok) throw new Error('Icecat response error')
         
+        // Si responde 403/401 (producto no incluido en Open Icecat gratis), fallback silencioso
+        if (res.status === 403 || res.status === 401) return
+        if (!res.ok) throw new Error(`Icecat HTTP ${res.status}`)
+
         const data = await res.json()
-        
-        // Si el producto existe y tiene galería de fotos en Open Icecat
-        if (data && data.Gallery && Array.isArray(data.Gallery) && data.Gallery.length > 0) {
-          const icecatPics = data.Gallery.map((item: IcecatImage) => item.Pic).filter(Boolean)
-          
-          if (icecatPics.length > 0) {
-            // Unir la imagen fallback inicial con las de Icecat para asegurar que no perdemos ninguna,
-            // pero eliminando duplicados por si acaso.
-            const uniqueImages = Array.from(new Set([imagenFallback, ...icecatPics]))
-            setImages(uniqueImages)
-          }
+        const payload = data?.data ?? data
+        const fetchedPics: string[] = []
+
+        // 1. Galería adicional de ángulos
+        if (payload && payload.Gallery && Array.isArray(payload.Gallery)) {
+          payload.Gallery.forEach((item: IcecatImage) => {
+            const picUrl = item.HighPic || item.Pic || item.LowPic
+            if (picUrl) fetchedPics.push(picUrl)
+          })
+        }
+
+        // 2. Imagen principal de alta resolución de Icecat (si existe)
+        const mainHighPic = payload?.GeneralInfo?.HighPic || payload?.GeneralInfo?.Pic
+        if (mainHighPic) {
+          fetchedPics.unshift(mainHighPic)
+        }
+
+        if (fetchedPics.length > 0) {
+          // Combinar fallback local con imágenes de Icecat evitando duplicados
+          const uniqueImages = Array.from(new Set([imagenFallback, ...fetchedPics]))
+          setImages(uniqueImages)
         }
       } catch (err) {
-        console.warn('No se pudieron cargar imágenes adicionales de Open Icecat:', err)
+        console.warn('Imágenes adicionales de Icecat no disponibles:', err)
       } finally {
         setLoading(false)
       }
@@ -78,9 +91,9 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
         
         {/* Indicador de carga discreto de Icecat */}
         {loading && (
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#1B2B6B] text-xs font-semibold animate-pulse z-10">
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>Buscando ángulos...</span>
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#1B2B6B] text-xs font-semibold animate-pulse z-10">
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1B2B6B]" />
+            <span>Buscando fotos HD...</span>
           </div>
         )}
 
@@ -211,7 +224,6 @@ export default function IcecatGallery({ upc, imagenFallback, nombreProducto }: I
   )
 }
 
-// Pequeño componente auxiliar para escuchar la tecla escape en el cliente
 function ModalEscListener({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
