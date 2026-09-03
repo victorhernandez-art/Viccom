@@ -20,6 +20,13 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
   // Obtener todas las marcas y categorías existentes (o crearlas)
   const brandMap = await ensureBrands(ctProducts)
 
+  // Log diagnóstico: cuantos productos tienen precio de promoción
+  const conPromocion = ctProducts.filter(p => p.precioPromocion && p.precioPromocion > 0)
+  logger.info(`[syncProducts] Productos con promoción en catálogo CT: ${conPromocion.length} / ${ctProducts.length}`)
+  if (conPromocion.length > 0 && conPromocion.length <= 10) {
+    conPromocion.forEach(p => logger.info(`  SKU=${p.clave} precioPromo=${p.precioPromocion} vigencia=${p.promocionVigenciaFin ?? 'sin fecha'}`))
+  }
+
   // Obtener SKUs existentes para detectar descontinuados
   const { data: existingSkus } = await supabaseAdmin
     .from('products')
@@ -101,6 +108,12 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
         stats.productos_nuevos++
       }
     })
+
+    // Log diagnóstico de ofertas guardadas en este batch
+    const batchConPromo = batch.filter(p => p.precioPromocion && p.precioPromocion > 0)
+    if (batchConPromo.length > 0) {
+      logger.info(`[syncProducts] Batch offset=${i}: ${batchConPromo.length} productos con oferta guardados`)
+    }
   }
 
   // Marcar descontinuados: SKUs que están en DB pero no en el catálogo

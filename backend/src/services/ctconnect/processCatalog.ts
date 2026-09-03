@@ -128,11 +128,28 @@ export async function processCatalog(filePath: string): Promise<CTProduct[]> {
     let promocionVigenciaFin: string | undefined = undefined
 
     if (Array.isArray(i.promociones) && i.promociones.length > 0) {
-      const promoImporte = i.promociones.find((p: any) => p.tipo === 'importe' && Number(p.promocion) > 0)
-      if (promoImporte) {
-        precioPromocion = Number(promoImporte.promocion)
-        if (promoImporte.vigencia?.fin) {
-          promocionVigenciaFin = String(promoImporte.vigencia.fin)
+      // Aceptar cualquier tipo de promoción que tenga un precio válido > 0.
+      // CT Internacional puede usar distintos valores para el campo 'tipo'
+      // (p.ej. 'importe', 'precio', 'descuento', 'especial').
+      // Elegimos la promoción con el precio más bajo para beneficiar al cliente.
+      const promosValidas = i.promociones.filter(
+        (p: any) => p.promocion !== undefined && Number(p.promocion) > 0
+      )
+
+      // Log diagnóstico: reportar tipos de promoción vistos (solo si hay promos)
+      if (promosValidas.length > 0) {
+        const tiposVistos = [...new Set(promosValidas.map((p: any) => String(p.tipo ?? 'sin_tipo')))]
+        logger.debug(`Promociones encontradas en SKU ${String(i.clave ?? '')}: tipos=[${tiposVistos.join(',')}] count=${promosValidas.length}`)
+      }
+
+      if (promosValidas.length > 0) {
+        // Usar la promoción de menor precio
+        const mejorPromo = promosValidas.reduce((best: any, curr: any) =>
+          Number(curr.promocion) < Number(best.promocion) ? curr : best
+        )
+        precioPromocion = Number(mejorPromo.promocion)
+        if (mejorPromo.vigencia?.fin) {
+          promocionVigenciaFin = String(mejorPromo.vigencia.fin)
         }
       }
     }
