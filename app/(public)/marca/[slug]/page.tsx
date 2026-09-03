@@ -11,6 +11,10 @@ import SortSelect from '@/components/catalog/SortSelect'
 import { type ProductCatalog, type CatalogSortOption } from '@/types'
 import { ChevronRight } from 'lucide-react'
 
+export const revalidate = 3600 // Cachea la página en la CDN de Vercel por 1 hora
+
+const BRAND_CARD_FIELDS = 'id, sku_ct, nombre, slug, precio_publico, precio_antes, imagen_principal, existencia_total, existencia_tuxtla, en_oferta, fecha_fin_oferta, destacado, marca_id, marca_nombre, marca_slug, categoria_id, categoria_nombre, categoria_slug'
+
 const PAGE_SIZE = 24
 
 interface BrandPageProps {
@@ -21,7 +25,7 @@ interface BrandPageProps {
 export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {
   const { slug } = await params
   const supabase  = await createClient()
-  const { data }  = await supabase.from('brands').select('*').eq('slug', slug).single()
+  const { data }  = await supabase.from('brands').select('nombre,slug,descripcion,logo_url').eq('slug', slug).single()
   if (!data) return { title: 'Marca no encontrada' }
   return buildBrandMetadata(data)
 }
@@ -36,7 +40,7 @@ export default async function BrandPage({ params, searchParams }: BrandPageProps
   const supabase = await createClient()
 
   const [brandRes, settingsRes] = await Promise.all([
-    supabase.from('brands').select('*').eq('slug', slug).eq('activo', true).single(),
+    supabase.from('brands').select('id,nombre,slug,descripcion,logo_url').eq('slug', slug).eq('activo', true).single(),
     supabase.from('settings').select('key,value').in('key', ['whatsapp_number']),
   ]) as [any, any]
 
@@ -47,7 +51,7 @@ export default async function BrandPage({ params, searchParams }: BrandPageProps
 
   let query = supabase
     .from('v_products_catalog')
-    .select('*', { count: 'exact' })
+    .select(BRAND_CARD_FIELDS, { count: 'exact' })
     .eq('marca_id', brand.id)
 
   switch (orderBy) {

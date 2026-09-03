@@ -17,7 +17,9 @@ import {
   Warehouse,
 } from 'lucide-react'
 
-export const revalidate = 300 // Revalidar la caché en segundo plano cada 5 minutos para ahorrar ancho de banda y optimizar el consumo en Vercel
+export const revalidate = 3600 // Cachea la página en la CDN de Vercel por 1 hora
+
+const RELATED_CARD_FIELDS = 'id, sku_ct, nombre, slug, precio_publico, precio_antes, imagen_principal, existencia_total, existencia_tuxtla, en_oferta, fecha_fin_oferta, destacado, marca_id, marca_nombre, marca_slug, categoria_id, categoria_nombre, categoria_slug'
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
@@ -70,14 +72,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const [inventoryRes, relatedRes, settingsRes] = await Promise.all([
     supabase
       .from('inventory')
-      .select('*')
+      .select('id,product_id,almacen,almacen_nombre,existencia')
       .eq('product_id', product.id)
       .gt('existencia', 0)
       .order('existencia', { ascending: false }),
 
     supabase
       .from('v_products_catalog')
-      .select('*')
+      .select(RELATED_CARD_FIELDS)
       .neq('id', product.id)
       .gt('existencia_total', 0)
       .in('categoria_slug', targetCategorySlugs)

@@ -58,6 +58,15 @@ El proyecto consta de dos partes principales que interactúan con **Supabase** c
 *   **Backend de Sincronización:**
     *   **Parser ([processCatalog.ts](file:///c:/xampp/htdocs/Viccom/backend/src/services/ctconnect/processCatalog.ts)):** Mapeamos los datos de promociones de tipo importe y su fecha de fin del array `promociones`.
     *   **Importación ([syncProducts.ts](file:///c:/xampp/htdocs/Viccom/backend/src/services/ctconnect/syncProducts.ts)):** Convertimos a pesos y guardamos `costo_promocion`, `fecha_fin_oferta` y `en_oferta` al hacer el upsert de los productos.
+    *   **Corrección de Vigencia y Filtro de Ofertas (Septiembre 2026):**
+        *   Se flexibilizó el parser de `processCatalog.ts` para aceptar cualquier tipo de promoción con precio mayor a 0 que envíe CT Connect.
+        *   Se actualizó la función SQL `recalcular_precios_masivo` en Supabase para activar automáticamente la oferta si el producto trae `costo_promocion > 0`, sin depender de que la fecha de vigencia enviada por el proveedor esté desfasada. Esto activó más de 700 ofertas en vivo con sus respectivos precios tachados y cálculos de IVA + margen.
+
+### 6. Optimización de Egress en Supabase (Plan Gratuito 5GB)
+*   **Ajuste del Cron (VPS):** Se modificó la frecuencia de sincronización en [cronSync.ts](file:///c:/xampp/htdocs/Viccom/backend/src/jobs/cronSync.ts) de `*/15 * * * *` a `0 */3 * * *` (cada 3 horas), reduciendo el tráfico en un 91.6%.
+*   **Sincronización Inteligente (Smart Diff en [syncProducts.ts](file:///c:/xampp/htdocs/Viccom/backend/src/services/ctconnect/syncProducts.ts)):** Antes de enviar lotes de upsert, se compara el costo, stock y promoción contra los registros en memoria. Solo se transmiten a la base de datos los productos nuevos o que cambiaron.
+*   **Estrategia ISR y Caché de Vercel:** Se eliminó `force-dynamic` y se configuró `export const revalidate = 3600` (1 hora) en catálogo, home, fichas de producto, categorías y marcas para que las páginas se sirvan desde el CDN de Vercel sin consultar la base de datos en cada visita.
+*   **Podado de Consultas SQL:** Se reemplazó `select('*')` por columnas indispensables en todas las vistas públicas (`app/(public)/`), evitando transferir descripciones y fichas técnicas pesadas innecesariamente en listados y carruseles.
 
 ---
 

@@ -27,18 +27,90 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
     conPromocion.forEach(p => logger.info(`  SKU=${p.clave} precioPromo=${p.precioPromocion} vigencia=${p.promocionVigenciaFin ?? 'sin fecha'}`))
   }
 
-  // Obtener SKUs existentes para detectar descontinuados
-  const { data: existingSkus } = await supabaseAdmin
-    .from('products')
-    .select('sku_ct,id')
+  // Obtener productos existentes con campos mínimos para diff inteligente
+  const existingProductMap = new Map<string, {
+    costo_ct: number
+    costo_promocion: number | null
+    existencia_total: number
+    activo: boolean
+    descontinuado: boolean
+  }>()
 
-  const existingSet = new Set((existingSkus ?? []).map(r => r.sku_ct))
+  let page = 0
+  const PAGE_SIZE = 1000
+  let hasMore = true
+
+  while (hasMore) {
+    const { data: chunk, error } = await supabaseAdmin
+      .from('products')
+      .select('sku_ct, costo_ct, costo_promocion, existencia_total, activo, descontinuado')
+      .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+
+    if (error) {
+      logger.error('Error fetching existing products for smart diff', { error: error.message })
+      break
+    }
+
+    if (chunk && chunk.length > 0) {
+      for (const row of chunk) {
+        existingProductMap.set(row.sku_ct, {
+          costo_ct: Number(row.costo_ct ?? 0),
+          costo_promocion: row.costo_promocion !== null ? Number(row.costo_promocion) : null,
+          existencia_total: Number(row.existencia_total ?? 0),
+          activo: Boolean(row.activo),
+          descontinuado: Boolean(row.descontinuado),
+        })
+      }
+      page++
+      if (chunk.length < PAGE_SIZE) hasMore = false
+    } else {
+      hasMore = false
+    }
+  }
+
+  const existingSet = new Set(existingProductMap.keys())
   const incomingSet = new Set(ctProducts.map(p => p.clave))
+  logger.info(`[syncProducts] Loaded ${existingProductMap.size} existing products for change detection`)
 
-  // Upsert productos en lotes de 500
+  // Filtrar solo productos con cambios reales o nuevos
+  const productsToUpsert: CTProduct[] = []
+
+  for (const p of ctProducts) {
+    const existing = existingProductMap.get(p.clave)
+    const existenciaTotal = p.existencia.reduce((total, item) => total + Number(item.existencia ?? 0), 0)
+    const isUsd = p.moneda?.toUpperCase() === 'USD'
+    const tipoCambio = Number(p.tipoCambio ?? 1)
+    const costoPesos = Number((p.precio * (isUsd ? tipoCambio : 1)).toFixed(2))
+
+    let costoPromocionPesos: number | null = null
+    if (p.precioPromocion && p.precioPromocion > 0) {
+      costoPromocionPesos = Number((p.precioPromocion * (isUsd ? tipoCambio : 1)).toFixed(2))
+    }
+
+    if (!existing) {
+      // Producto nuevo -> debe guardarse
+      productsToUpsert.push(p)
+      stats.productos_nuevos++
+    } else {
+      // Comparar cambios reales
+      const costoCambio = Math.abs(existing.costo_ct - costoPesos) > 0.01
+      const promoCambio = existing.costo_promocion !== costoPromocionPesos
+      const stockCambio = existing.existencia_total !== existenciaTotal
+      const activoCambio = existing.activo !== p.activo || existing.descontinuado === true
+
+      if (costoCambio || promoCambio || stockCambio || activoCambio) {
+        productsToUpsert.push(p)
+        stats.productos_actualizados++
+      }
+    }
+  }
+
+  logger.info(`[syncProducts] Smart diff result: ${productsToUpsert.length} modified/new products to upsert out of ${ctProducts.length} total (${ctProducts.length - productsToUpsert.length} unchanged skipped)`)
+
+  // Upsert de productos únicamente modificados en lotes de 500
   const BATCH = 500
-  for (let i = 0; i < ctProducts.length; i += BATCH) {
-    const batch = ctProducts.slice(i, i + BATCH)
+  for (let i = 0; i < productsToUpsert.length; i += BATCH) {
+    const batch = productsToUpsert.slice(i, i + BATCH)
     const categoryIds = await resolveCategoryIds(batch)
 
     const rows = batch.map(p => {
@@ -50,7 +122,6 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
       const tipoCambio = Number(p.tipoCambio ?? 1)
       const costoPesos = Number((p.precio * (isUsd ? tipoCambio : 1)).toFixed(2))
 
-      // Calcular costo promocional si aplica
       let costoPromocionPesos: number | null = null
       if (p.precioPromocion && p.precioPromocion > 0) {
         costoPromocionPesos = Number((p.precioPromocion * (isUsd ? tipoCambio : 1)).toFixed(2))
@@ -69,7 +140,7 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
         subcategoria: p.subcategoria,
         costo_ct:     costoPesos,
         costo_promocion: costoPromocionPesos,
-        precio_publico: costoPromocionPesos ?? costoPesos, // Valor inicial temporal, recalcular_precios_masivo aplicará la fórmula final
+        precio_publico: costoPromocionPesos ?? costoPesos,
         existencia_total: existenciaTotal,
         peso_kg:      p.peso,
         dimensiones: {
@@ -98,21 +169,6 @@ export async function syncProducts(ctProducts: CTProduct[]): Promise<SyncStats> 
     if (error) {
       logger.error('Error upserting products batch', { error: error.message, offset: i })
       continue
-    }
-
-    // Contar nuevos vs actualizados
-    batch.forEach(p => {
-      if (existingSet.has(p.clave)) {
-        stats.productos_actualizados++
-      } else {
-        stats.productos_nuevos++
-      }
-    })
-
-    // Log diagnóstico de ofertas guardadas en este batch
-    const batchConPromo = batch.filter(p => p.precioPromocion && p.precioPromocion > 0)
-    if (batchConPromo.length > 0) {
-      logger.info(`[syncProducts] Batch offset=${i}: ${batchConPromo.length} productos con oferta guardados`)
     }
   }
 

@@ -16,24 +16,25 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 300 // revalidar cada 5 minutos
+export const revalidate = 3600 // Cachea la página en la CDN de Vercel por 1 hora
+
+const HOME_CARD_FIELDS = 'id, sku_ct, nombre, slug, precio_publico, precio_antes, imagen_principal, existencia_total, existencia_tuxtla, en_oferta, fecha_fin_oferta, destacado, marca_id, marca_nombre, marca_slug, categoria_id, categoria_nombre, categoria_slug'
 
 export default async function HomePage() {
   const supabase = await createClient()
 
   // Obtener datos en paralelo
-  // Obtener datos en paralelo
   const [categoriesRes, featuredRes, laptopsRes, othersRes, settingsRes] = await Promise.all([
     supabase
       .from('categories')
-      .select('*')
+      .select('id,nombre,slug,descripcion,imagen_url,orden')
       .eq('activo', true)
       .order('orden', { ascending: true })
       .limit(8),
 
     supabase
       .from('v_products_catalog')
-      .select('*')
+      .select(HOME_CARD_FIELDS)
       .eq('destacado', true)
       .gt('existencia_total', 0)
       .order('fecha_actualizacion', { ascending: false })
@@ -42,7 +43,7 @@ export default async function HomePage() {
     // 1. Laptops baratas en oferta (precio de venta final <= $25,000 MXN)
     supabase
       .from('v_products_catalog')
-      .select('*')
+      .select(HOME_CARD_FIELDS)
       .eq('en_oferta', true)
       .gt('existencia_total', 0)
       .in('categoria_slug', ['computadoras-laptops', 'computadoras-gaming-laptops-gaming'])
@@ -52,7 +53,7 @@ export default async function HomePage() {
     // 2. Otros accesorios y equipos en oferta comunes (Mouses, Teclados, SSDs, Impresoras, Monitores, NoBreaks, Mochilas, Audífonos, etc.)
     supabase
       .from('v_products_catalog')
-      .select('*')
+      .select(HOME_CARD_FIELDS)
       .eq('en_oferta', true)
       .gt('existencia_total', 0)
       .in('categoria_slug', [

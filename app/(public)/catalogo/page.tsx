@@ -16,7 +16,9 @@ export const metadata: Metadata = buildMetadata({
   canonical: '/catalogo',
 })
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
+
+const CATALOG_CARD_FIELDS = 'id, sku_ct, nombre, slug, precio_publico, precio_antes, imagen_principal, existencia_total, existencia_tuxtla, en_oferta, fecha_fin_oferta, destacado, marca_id, marca_nombre, marca_slug, categoria_id, categoria_nombre, categoria_slug'
 
 interface CatalogoPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -51,8 +53,8 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
 
   // Cargar marcas, categorías y settings en paralelo
   const [brandsRes, categoriesRes, settingsRes] = await Promise.all([
-    supabase.from('brands').select('*').eq('activo', true).order('nombre'),
-    supabase.from('categories').select('*').eq('activo', true).order('orden'),
+    supabase.from('brands').select('id,nombre,slug').eq('activo', true).order('nombre'),
+    supabase.from('categories').select('id,nombre,slug,path,orden').eq('activo', true).order('orden'),
     supabase.from('settings').select('key,value').in('key', ['whatsapp_number']),
   ]) as [any, any, any]
 
@@ -61,10 +63,10 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
   const settings   = Object.fromEntries((settingsRes.data ?? []).map((s: any) => [s.key, s.value]))
   const whatsapp   = settings['whatsapp_number'] ?? ''
 
-  // Construir query de productos
+  // Construir query de productos con campos específicos
   let query = supabase
     .from('v_products_catalog')
-    .select('*', { count: 'exact' })
+    .select(CATALOG_CARD_FIELDS, { count: 'exact' })
 
   // Filtros
   if (filters.disponible) query = query.gt('existencia_total', 0)
@@ -120,7 +122,7 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
   if (filters.destacado && (!data || data.length === 0)) {
     let fallbackQuery = supabase
       .from('v_products_catalog')
-      .select('*', { count: 'exact' })
+      .select(CATALOG_CARD_FIELDS, { count: 'exact' })
       .gt('existencia_total', 0)
 
     if (filters.precio_min) fallbackQuery = fallbackQuery.gte('precio_publico', filters.precio_min)

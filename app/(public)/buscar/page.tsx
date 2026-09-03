@@ -18,6 +18,8 @@ export async function generateMetadata({ searchParams }: BuscarPageProps): Promi
   }
 }
 
+const SEARCH_CARD_FIELDS = 'id, sku_ct, nombre, slug, precio_publico, precio_antes, imagen_principal, existencia_total, existencia_tuxtla, en_oferta, fecha_fin_oferta, destacado, marca_id, marca_nombre, marca_slug, categoria_id, categoria_nombre, categoria_slug'
+
 export const dynamic = 'force-dynamic'
 
 export default async function BuscarPage({ searchParams }: BuscarPageProps) {
@@ -40,7 +42,7 @@ export default async function BuscarPage({ searchParams }: BuscarPageProps) {
   if (query.length >= 2) {
     const { data, count } = await supabase
       .from('v_products_catalog')
-      .select('*', { count: 'exact' })
+      .select(SEARCH_CARD_FIELDS, { count: 'exact' })
       .or(`nombre.ilike.%${query}%,sku_ct.ilike.%${query}%,subcategoria.ilike.%${query}%`)
       .order('destacado', { ascending: false })
       .order('existencia_total', { ascending: false })

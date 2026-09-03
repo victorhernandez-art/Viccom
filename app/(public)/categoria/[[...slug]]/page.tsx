@@ -9,6 +9,10 @@ import Pagination from '@/components/catalog/Pagination'
 import SortSelect from '@/components/catalog/SortSelect'
 import { type ProductCatalog, type CatalogSortOption } from '@/types'
 
+export const revalidate = 3600 // Cachea la página en la CDN de Vercel por 1 hora
+
+const CATEGORY_CARD_FIELDS = 'id, sku_ct, nombre, slug, precio_publico, precio_antes, imagen_principal, existencia_total, existencia_tuxtla, en_oferta, fecha_fin_oferta, destacado, marca_id, marca_nombre, marca_slug, categoria_id, categoria_nombre, categoria_slug'
+
 const PAGE_SIZE = 24
 
 interface CategoryPageProps {
@@ -23,7 +27,7 @@ function getPath(slug?: string[]): string {
 async function getCategoryByPathOrLegacySlug(supabase: any, path: string) {
   const byPath = await supabase
     .from('categories')
-    .select('*')
+    .select('id,nombre,slug,descripcion,path')
     .eq('path', path)
     .eq('activo', true)
     .maybeSingle()
@@ -34,7 +38,7 @@ async function getCategoryByPathOrLegacySlug(supabase: any, path: string) {
 
   return supabase
     .from('categories')
-    .select('*')
+    .select('id,nombre,slug,descripcion,path')
     .eq('slug', path)
     .eq('activo', true)
     .maybeSingle()
@@ -84,7 +88,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   let query = supabase
     .from('v_products_catalog')
-    .select('*', { count: 'exact' })
+    .select(CATEGORY_CARD_FIELDS, { count: 'exact' })
 
   if (categoryIds.length > 0) {
     query = query.in('categoria_id', categoryIds)

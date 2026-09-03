@@ -12,7 +12,7 @@ export default async function PublicLayout({
 
   const { data: categories } = await supabase
     .from('categories')
-    .select('*')
+    .select('id,nombre,slug,parent_id,nivel,path,orden,activo')
     .eq('activo', true)
     .order('nivel', { ascending: true })
     .order('orden', { ascending: true })

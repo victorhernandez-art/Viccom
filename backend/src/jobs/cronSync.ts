@@ -3,8 +3,8 @@ import { runFullSync } from '../services/sync'
 import { logger }      from '../utils/logger'
 
 export function startCronJobs(): void {
-  // Cada 15 minutos
-  cron.schedule('*/15 * * * *', async () => {
+  // Cada 3 horas
+  cron.schedule('0 */3 * * *', async () => {
     logger.info('Cron triggered: starting scheduled sync')
     try {
       await runFullSync()
@@ -13,5 +13,5 @@ export function startCronJobs(): void {
     }
   })
 
-  logger.info('Cron job registered: sync every 15 minutes')
+  logger.info('Cron job registered: sync every 3 hours (0 */3 * * *)')
 }
