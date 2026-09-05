@@ -24,7 +24,7 @@ const slides = [
     cta: 'Ver Impresoras',
     link: '/categoria/impresoras',
     accent: '#CC0000',
-    image: '/img/slider/2.png',
+    image: '/img/slider/2.jpg',
   },
   {
     id: 3,
