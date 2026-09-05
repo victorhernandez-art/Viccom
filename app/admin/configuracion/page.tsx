@@ -15,11 +15,11 @@ export default async function AdminConfiguracionPage() {
 
   const [settingsRes, categoriesRes] = await Promise.all([
     supabase.from('settings').select('key,value'),
-    supabase.from('categories').select('id,nombre,slug,margen_override').eq('activo', true).order('orden'),
+    supabase.from('categories').select('id,nombre,slug,margen_override,path').eq('activo', true).order('orden'),
   ]) as [any, any]
 
   const settings = Object.fromEntries((settingsRes.data ?? []).map((s: any) => [s.key, s.value]))
-  const categories = (categoriesRes.data ?? []) as Pick<Category, 'id' | 'nombre' | 'slug' | 'margen_override'>[]
+  const categories = (categoriesRes.data ?? []) as Pick<Category, 'id' | 'nombre' | 'slug' | 'margen_override' | 'path'>[]
 
   const globalMargin = Number(settings['margen_global'] ?? 30)
 

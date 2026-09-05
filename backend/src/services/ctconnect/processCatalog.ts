@@ -124,33 +124,63 @@ export async function processCatalog(filePath: string): Promise<CTProduct[]> {
     const categoriaPath = readCategoryPath(i)
     const specs = Array.isArray(i.especificaciones) ? i.especificaciones : []
 
+    const precioBase = Number(i.precio ?? i.precio_lista ?? 0)
+
     let precioPromocion: number | undefined = undefined
     let promocionVigenciaFin: string | undefined = undefined
 
-    if (Array.isArray(i.promociones) && i.promociones.length > 0) {
-      // Aceptar cualquier tipo de promoción que tenga un precio válido > 0.
-      // CT Internacional puede usar distintos valores para el campo 'tipo'
-      // (p.ej. 'importe', 'precio', 'descuento', 'especial').
-      // Elegimos la promoción con el precio más bajo para beneficiar al cliente.
-      const promosValidas = i.promociones.filter(
-        (p: any) => p.promocion !== undefined && Number(p.promocion) > 0
-      )
-
-      // Log diagnóstico: reportar tipos de promoción vistos (solo si hay promos)
-      if (promosValidas.length > 0) {
-        const tiposVistos = [...new Set(promosValidas.map((p: any) => String(p.tipo ?? 'sin_tipo')))]
-        logger.debug(`Promociones encontradas en SKU ${String(i.clave ?? '')}: tipos=[${tiposVistos.join(',')}] count=${promosValidas.length}`)
+    if (precioBase > 0 && Array.isArray(i.promociones) && i.promociones.length > 0) {
+      // Filtrar y calcular el costo neto de cada promoción según su tipo:
+      // - 'porcentaje': p.promocion representa el % de descuento (ej: 10, 20, 50%).
+      //                 costo = precioBase * (1 - p.promocion / 100)
+      // - 'importe':    p.promocion representa el costo promocional directo en moneda (ej: 76.20).
+      //                 costo = p.promocion
+      interface EvaluatedPromo {
+        costoPromo: number
+        vigenciaFin?: string
       }
 
-      if (promosValidas.length > 0) {
-        // Usar la promoción de menor precio
-        const mejorPromo = promosValidas.reduce((best: any, curr: any) =>
-          Number(curr.promocion) < Number(best.promocion) ? curr : best
+      const promosEvaluadas: EvaluatedPromo[] = i.promociones
+        .map((p: any): EvaluatedPromo | null => {
+          const val = Number(p?.promocion)
+          if (isNaN(val) || val <= 0) return null
+
+          const tipo = String(p?.tipo ?? '').toLowerCase().trim()
+          let costoPromo: number | null = null
+
+          if (tipo === 'porcentaje' || tipo.includes('porcent')) {
+            if (val > 0 && val < 100) {
+              costoPromo = Number((precioBase * (1 - val / 100)).toFixed(2))
+            }
+          } else if (tipo === 'importe' || tipo === 'precio') {
+            if (val < precioBase) {
+              costoPromo = Number(val.toFixed(2))
+            }
+          } else {
+            // Fallback para tipos sin especificar: si el valor es menor al costo base
+            if (val < precioBase) {
+              costoPromo = Number(val.toFixed(2))
+            }
+          }
+
+          if (costoPromo === null || costoPromo <= 0 || costoPromo >= precioBase) {
+            return null
+          }
+
+          return {
+            costoPromo,
+            vigenciaFin: p?.vigencia?.fin ? String(p.vigencia.fin) : undefined,
+          }
+        })
+        .filter((p): p is EvaluatedPromo => p !== null)
+
+      if (promosEvaluadas.length > 0) {
+        // Elegir la promoción que resulta en el MENOR costo (mayor ahorro para el cliente)
+        const mejorPromo = promosEvaluadas.reduce((best, curr) =>
+          curr.costoPromo < best.costoPromo ? curr : best
         )
-        precioPromocion = Number(mejorPromo.promocion)
-        if (mejorPromo.vigencia?.fin) {
-          promocionVigenciaFin = String(mejorPromo.vigencia.fin)
-        }
+        precioPromocion = mejorPromo.costoPromo
+        promocionVigenciaFin = mejorPromo.vigenciaFin
       }
     }
 

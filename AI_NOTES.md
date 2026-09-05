@@ -52,12 +52,15 @@ El proyecto consta de dos partes principales que interactúan con **Supabase** c
 *   **Aspecto Responsivo y Controles:** Se optimizó el slider para usar una relación de aspecto de `aspect-[16/9] md:aspect-[3/1]` para una visualización correcta en móviles, y se estilizaron los controles de navegación (flechas en hover e indicadores dinámicos).
 
 ### 5. Soporte y Activación de Promociones del Proveedor (CT Internacional)
-*   **Diagnóstico:** El catálogo no mostraba ofertas debido a:
-    1. El parser solo buscaba `tipo === 'importe'` en las promociones del JSON, ignorando otros tipos válidos con descuento.
+*   **Diagnóstico:** El catálogo presentaba dos problemas en las ofertas:
+    1. El parser original solo buscaba `tipo === 'importe'`. Al flexibilizarlo, se descubrió que CT Internacional maneja dos tipos:
+       - `tipo: 'importe'`: el campo `promocion` es el costo final en moneda (ej. $76.20).
+       - `tipo: 'porcentaje'`: el campo `promocion` es el % de descuento (ej. 10%, 20%, 50%).
+       Al tratarse ambos como importe monetario, productos con 50% de descuento (como el antivirus ESET `SOFEST3860` o impresoras) guardaban `costo_promocion = 50` pesos en vez del costo con 50% de descuento, vendiéndose a precios absurdos como $75.40 o $9.74 pesos.
     2. La base de datos descartaba las promociones evaluando `fecha_fin_oferta > NOW()`, mientras que CT enviaba fechas ya pasadas para promociones que mantenía activas en su feed diario.
 *   **Correcciones Implementadas:**
-    *   **Parser ([processCatalog.ts](file:///c:/xampp/htdocs/Viccom/backend/src/services/ctconnect/processCatalog.ts)):** Se flexibilizó para capturar cualquier promoción válida con precio mayor a 0, seleccionando la más económica.
-    *   **Base de Datos ([recalcular_precios_masivo](file:///c:/xampp/htdocs/Viccom/database/migration_promocion_proveedor.sql)):** Se actualizó la función en Supabase para activar `en_oferta = TRUE` y calcular el `precio_antes` tachado automáticamente siempre que `costo_promocion > 0`, sin bloquear por fechas desfasadas del proveedor. Esto activó más de 700 ofertas en la tienda pública en vivo.
+    *   **Parser ([processCatalog.ts](file:///c:/xampp/htdocs/Viccom/backend/src/services/ctconnect/processCatalog.ts)):** Distingue explícitamente entre `porcentaje` ($costo = precio \times (1 - promo/100)$) e `importe` ($costo = promo$), validando que el costo calculado sea positivo y menor al precio de lista, y seleccionando la promoción de mayor descuento neto para el usuario.
+    *   **Base de Datos ([recalcular_precios_masivo](file:///c:/xampp/htdocs/Viccom/database/migration_promocion_proveedor.sql)):** Se actualizó la función en Supabase para activar `en_oferta = TRUE` y calcular el `precio_antes` tachado automáticamente siempre que `costo_promocion > 0`, sin bloquear por fechas desfasadas del proveedor. Todos los precios de oferta y tachados han sido recalculados y normalizados.
 
 ### 6. Optimización Integral de Egress en Supabase (Límite Plan Gratuito 5GB)
 *   **Ajuste del Cron (VPS):** Se modificó la frecuencia en [cronSync.ts](file:///c:/xampp/htdocs/Viccom/backend/src/jobs/cronSync.ts) de `*/15 * * * *` a `0 */3 * * *` (cada 3 horas), reduciendo las consultas periódicas en un 91.6% (de 96 a 8 ejecuciones diarias).
@@ -74,6 +77,17 @@ El proyecto consta de dos partes principales que interactúan con **Supabase** c
         *   `app/(public)/marca/[slug]/page.tsx`
     *   Las páginas se sirven desde la CDN Edge de Vercel en caché, eliminando las consultas repetitivas a Supabase por cada visita de usuarios o bots.
 *   **Podado de Consultas SQL:** Se reemplazó `select('*')` en todas las páginas públicas por proyecciones explícitas de columnas (`CATALOG_CARD_FIELDS`), evitando transferir campos pesados como descripciones completas, fichas técnicas y JSONs de especificaciones en listados y carruseles.
+
+### 7. Buscador Optimizado de Categorías y Productos en Panel Comercial (/admin/configuracion)
+*   **Búsqueda Instantánea en Cliente ([MarginSettings.tsx](file:///c:/xampp/htdocs/Viccom/components/admin/MarginSettings.tsx)):**
+    *   Filtra en tiempo real (0ms de latencia) entre las 328 categorías activas normalizando acentos y minúsculas por `nombre`, jerarquía `path` (ej. `computadoras / laptops`) y `slug`.
+    *   Permite escribir términos como `"lap"`, `"antivirus"`, `"monitor"`, `"brother"`, etc., mostrando inmediatamente solo las categorías relevantes sin necesidad de hacer scroll vertical extensivo.
+*   **Búsqueda Semántica por Producto ([search-by-product/route.ts](file:///c:/xampp/htdocs/Viccom/app/api/admin/categories/search-by-product/route.ts)):**
+    *   API debounced (280ms) que consulta productos activos por nombre o SKU (`SOFEST`, `ESET`, `ThinkPad`, `Inspiron`) y vincula sus categorías automáticamente, mostrando una etiqueta visual destacada: *"Coincide con producto: [Nombre del producto]"*.
+*   **Filtros Rápidos y Acciones:**
+    *   Pestañas para alternar entre: *Todas*, *Con margen personalizado* y *Con margen global*.
+    *   Botón para restablecer categoría al margen global con 1 clic.
+    *   Barra flotante inferior para guardar o forzar recálculo sin perder la posición de scroll.
 
 ---
 
