@@ -89,6 +89,19 @@ El proyecto consta de dos partes principales que interactúan con **Supabase** c
     *   Botón para restablecer categoría al margen global con 1 clic.
     *   Barra flotante inferior para guardar o forzar recálculo sin perder la posición de scroll.
 
+### 8. Buscador en Vivo del Catálogo Público con Autocompletado y Multicampo
+*   **Componente Dinámico ([HeaderSearch.tsx](file:///c:/xampp/htdocs/Viccom/components/layout/HeaderSearch.tsx)):**
+    *   Integra autocompletado en vivo tipo e-commerce moderno al escribir 2 o más letras en la barra principal del encabezado (desktop y móvil).
+    *   Muestra popover desplegable con:
+        1. **Categorías coincidentes:** acceso directo con 1 clic a la categoría (ej. `"lap"` sugiere *Laptops*, *Laptops Gaming*).
+        2. **Marcas sugeridas:** acceso directo a la marca (ej. `"dell"` sugiere marca *Dell*).
+        3. **Productos destacados:** miniatura, título, SKU, precio público, badge de oferta si aplica y precio antes tachado.
+        4. Botón inferior *"Ver todos los resultados para '[búsqueda]' →"*.
+    *   Soporta navegación por teclado (`Escape` para cerrar, botón `X` de limpieza rápida).
+*   **Búsqueda Multicampo ([route.ts](file:///c:/xampp/htdocs/Viccom/app/api/search/route.ts), [buscar/page.tsx](file:///c:/xampp/htdocs/Viccom/app/\(public\)/buscar/page.tsx), [catalogo/page.tsx](file:///c:/xampp/htdocs/Viccom/app/\(public\)/catalogo/page.tsx)):**
+    *   Ahora busca simultáneamente por `nombre`, `sku_ct`, `subcategoria`, `marca_nombre` y `categoria_nombre`.
+    *   En la página `/buscar`, muestra píldoras interactivas con categorías y marcas relacionadas encima de la cuadrícula de productos.
+
 ---
 
 ## ☁️ Guía Básica de Supabase para el Proyecto
