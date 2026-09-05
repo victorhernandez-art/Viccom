@@ -101,7 +101,10 @@ export default async function CatalogoPage({ searchParams }: CatalogoPageProps) 
   }
 
   if (filters.query) {
-    query = query.ilike('nombre', `%${filters.query}%`)
+    const q = filters.query.trim()
+    query = query.or(
+      `nombre.ilike.%${q}%,sku_ct.ilike.%${q}%,subcategoria.ilike.%${q}%,marca_nombre.ilike.%${q}%,categoria_nombre.ilike.%${q}%`
+    )
   }
 
   // Ordenamiento

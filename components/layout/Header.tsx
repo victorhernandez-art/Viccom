@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { type Category } from '@/types'
+import HeaderSearch from './HeaderSearch'
 
 interface HeaderProps {
   categories?: Category[]
@@ -164,7 +165,6 @@ function flattenCategoryTree(nodes: CategoryNode[]) {
 
 export default function Header({ categories = [] }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const [scrolled, setScrolled] = useState(false)
   const [catOpen, setCatOpen] = useState(false)
   const [activeRootId, setActiveRootId] = useState<string | null>(null)
@@ -234,16 +234,6 @@ export default function Header({ categories = [] }: HeaderProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  function handleSearch(e: FormEvent) {
-    e.preventDefault()
-
-    if (searchQuery.trim()) {
-      router.push(`/buscar?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery('')
-      setMenuOpen(false)
-    }
-  }
-
   function handleMobileCategoryClick(catId: string) {
     setExpandedMobileCatId(expandedMobileCatId === catId ? null : catId)
   }
@@ -291,25 +281,7 @@ export default function Header({ categories = [] }: HeaderProps) {
             />
           </Link>
 
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl items-center">
-            <div className="flex w-full rounded-lg border border-gray-300 overflow-hidden focus-within:border-[#1B2B6B] transition-colors">
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar productos, marcas, SKU..."
-                className="flex-1 px-4 py-2 text-sm outline-none bg-white text-gray-800 placeholder:text-gray-400"
-                aria-label="Buscar productos"
-              />
-              <button
-                type="submit"
-                className="bg-[#CC0000] hover:bg-[#A30000] px-4 text-white transition-colors"
-                aria-label="Buscar"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-            </div>
-          </form>
+          <HeaderSearch className="hidden md:flex flex-1 max-w-2xl" />
 
           <button
             className="md:hidden ml-auto p-2 text-[#1B2B6B]"
@@ -489,21 +461,8 @@ export default function Header({ categories = [] }: HeaderProps) {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="p-4 border-b border-gray-50 bg-gray-50">
-              <form onSubmit={handleSearch} className="flex items-center">
-                <div className="flex w-full rounded-lg border border-gray-300 overflow-hidden focus-within:border-[#1B2B6B] bg-white transition-colors">
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar productos..."
-                    className="flex-1 px-3 py-2 text-sm outline-none bg-white text-gray-800 placeholder:text-gray-400"
-                  />
-                  <button type="submit" className="bg-[#CC0000] px-3 text-white">
-                    <Search className="w-4 h-4" />
-                  </button>
-                </div>
-              </form>
+            <div className="p-4 border-b border-gray-100 bg-gray-50">
+              <HeaderSearch onNavigate={() => setMenuOpen(false)} />
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
               <Link href="/" onClick={() => setMenuOpen(false)} className="block py-3 border-b border-gray-100 text-gray-700 font-semibold hover:text-[#CC0000]">Inicio</Link>
